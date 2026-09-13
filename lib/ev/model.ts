@@ -86,11 +86,11 @@ export function getArrivalStatus(endBatteryPct: number): ArrivalStatus {
 export function getArrivalStatusLabel(status: ArrivalStatus): string {
   switch (status) {
     case "insufficient":
-      return "Insufficient Range";
+      return "🔴 Charging stop required";
     case "low":
-      return "Low Buffer Warning";
+      return "🟡 Quick 10-min pit stop recommended";
     default:
-      return "Ready to Roll";
+      return "🟢 Easy Drive — No stops needed";
   }
 }
 

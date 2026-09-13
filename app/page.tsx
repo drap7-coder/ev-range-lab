@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import { cars, DEFAULT_CAR, type EvCar } from "@/lib/ev/cars";
@@ -31,6 +31,7 @@ type ViewMode = "single" | "compare";
 
 function RangeControl({
   label,
+  help,
   value,
   min,
   max,
@@ -39,6 +40,7 @@ function RangeControl({
   onChange,
 }: {
   label: string;
+  help: string;
   value: number;
   min: number;
   max: number;
@@ -46,16 +48,25 @@ function RangeControl({
   unit: string;
   onChange: (value: number) => void;
 }) {
+  const inputId = useId();
+
   return (
-    <label className="range-control">
+    <div className="range-control">
       <span>
-        <span>{label}</span>
+        <label className="range-label" htmlFor={inputId}>
+          {label}
+        </label>
+        <span className="info-wrap">
+          <button className="info-button" type="button" aria-label={`Why ${label.toLowerCase()} matters`}>?</button>
+          <span className="info-popover" role="tooltip">{help}</span>
+        </span>
         <strong>
           {value}
           {unit}
         </strong>
       </span>
       <input
+        id={inputId}
         type="range"
         min={min}
         max={max}
@@ -64,7 +75,41 @@ function RangeControl({
         aria-valuetext={`${value}${unit}`}
         onChange={(event) => onChange(Number(event.target.value))}
       />
-    </label>
+    </div>
+  );
+}
+
+function tankEquivalent(percent: number) {
+  if (percent <= 0) return "empty";
+  if (percent < 18) return "less than 1/4 tank";
+  if (percent < 38) return "about 1/4 tank";
+  if (percent < 63) return "about 1/2 tank";
+  if (percent < 88) return "about 3/4 tank";
+  return "nearly a full tank";
+}
+
+function CostComparison({ distance, energyKwh }: { distance: number; energyKwh: number }) {
+  const gasCost = (distance / 28) * 3.5;
+  const evCost = energyKwh * 0.16;
+
+  return (
+    <section className="cost-comparison" aria-labelledby="cost-title">
+      <div className="cost-heading">
+        <span>GAS VS. EV</span>
+        <h3 id="cost-title">Same trip. Different routine.</h3>
+      </div>
+      <div className="cost-grid">
+        <article className="cost-card gas-card">
+          <span className="cost-icon" aria-hidden="true">⛽</span>
+          <div><small>Gas vehicle</small><strong>~${Math.round(gasCost)}</strong><p>Estimated fuel cost, plus a gas station visit.</p></div>
+        </article>
+        <article className="cost-card ev-card">
+          <span className="cost-icon" aria-hidden="true">⚡</span>
+          <div><small>Electric vehicle</small><strong>~${Math.round(evCost)}</strong><p>Estimated home charging cost—and you can start each morning full.</p></div>
+        </article>
+      </div>
+      <p className="cost-assumptions">Illustrative comparison: 28 mpg at $3.50/gal vs. home charging at $0.16/kWh.</p>
+    </section>
   );
 }
 
@@ -111,6 +156,7 @@ function OutlookCard({
   car,
   estimate,
   distance,
+  startBattery,
   tip,
   charge,
   moreEfficient,
@@ -120,6 +166,7 @@ function OutlookCard({
   car: EvCar;
   estimate: TripEstimate;
   distance: number;
+  startBattery: number;
   tip: string;
   charge: ReturnType<typeof getChargeRecommendation>;
   moreEfficient: boolean;
@@ -160,18 +207,26 @@ function OutlookCard({
         </div>
       </div>
 
-      <div className="metrics">
+      <div className="tank-equivalent">
+        <div className="tank-label">
+          <small>Gas tank equivalent</small>
+          <strong>Arrives with {tankEquivalent(estimate.endBatteryPct)} remaining</strong>
+        </div>
+        <div className="tank-track" aria-hidden="true"><span style={{ width: `${gauge}%` }} /></div>
+      </div>
+
+      <div className="metrics beginner-metrics">
         <div>
           <small>Range left</small>
           <strong>~{Math.round(estimate.remainingRangeMi)} mi</strong>
         </div>
         <div>
-          <small>Energy use</small>
-          <strong>{estimate.whPerMi} Wh/mi</strong>
+          <small>Stops needed</small>
+          <strong>{status === "ready" ? "None" : "Plan one"}</strong>
         </div>
         <div>
-          <small>Trip energy</small>
-          <strong>{estimate.energyUsedKwh.toFixed(1)} kWh</strong>
+          <small>Starting charge</small>
+          <strong>{startBattery}%</strong>
         </div>
       </div>
 
@@ -374,10 +429,11 @@ export default function Home() {
             </div>
           </div>
 
-          <RangeControl label="Trip distance" value={distance} min={5} max={400} step={5} unit=" mi" onChange={setDistance} />
-          <RangeControl label="Starting battery" value={battery} min={10} max={100} step={5} unit="%" onChange={setBattery} />
+          <RangeControl label="Trip distance" help="How far you plan to drive before reaching your destination or next charger." value={distance} min={5} max={400} step={5} unit=" mi" onChange={setDistance} />
+          <RangeControl label="Starting battery" help="Think of this like the fuel gauge when you leave. Most EV owners charge at home overnight." value={battery} min={10} max={100} step={5} unit="%" onChange={setBattery} />
           <RangeControl
             label="Outside temperature"
+            help="Cold slows the battery's chemistry and cabin heat uses extra energy. Preheating while plugged in helps."
             value={temperature}
             min={-10}
             max={110}
@@ -385,7 +441,7 @@ export default function Home() {
             unit="°F"
             onChange={setTemperature}
           />
-          <RangeControl label="Average speed" value={speed} min={20} max={85} unit=" mph" onChange={setSpeed} />
+          <RangeControl label="Average speed" help="Driving faster pushes much more air out of the way. Highway speed usually reduces range the most." value={speed} min={20} max={85} unit=" mph" onChange={setSpeed} />
 
           <div className="field-grid">
             <label className="select-label" htmlFor="terrain">
@@ -428,6 +484,7 @@ export default function Home() {
 
           <RangeControl
             label="Net elevation"
+            help="Long climbs use extra energy. You regain some on the way down through regenerative braking, but not all of it."
             value={elevationGainFt}
             min={-3000}
             max={5000}
@@ -435,7 +492,7 @@ export default function Home() {
             unit=" ft"
             onChange={setElevationGainFt}
           />
-          <RangeControl label="Passengers + cargo" value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
+          <RangeControl label="Passengers + cargo" help="More people and luggage add weight. The effect is usually smaller than speed or temperature." value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
         </div>
 
         <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}`}>
@@ -444,6 +501,7 @@ export default function Home() {
               car={car}
               estimate={result}
               distance={distance}
+              startBattery={battery}
               tip={tip}
               charge={charge}
               moreEfficient={winnerId === car.id}
@@ -455,6 +513,7 @@ export default function Home() {
                 car={carB}
                 estimate={resultB}
                 distance={distance}
+                startBattery={battery}
                 tip={tipB}
                 charge={chargeB}
                 moreEfficient={winnerId === carB.id}
@@ -479,6 +538,10 @@ export default function Home() {
                   <strong>{factor.multiplier.toFixed(2)}×</strong>
                 </div>
               ))}
+              <div className="expert-numbers">
+                <span><small>Energy use</small><strong>{result.whPerMi} Wh/mi</strong></span>
+                <span><small>Trip energy</small><strong>{result.energyUsedKwh.toFixed(1)} kWh</strong></span>
+              </div>
               {result.elevationWhPerMi !== 0 ? (
                 <p className="method-note">
                   Elevation adds {result.elevationWhPerMi > 0 ? "+" : ""}
@@ -490,6 +553,8 @@ export default function Home() {
               )}
             </div>
           ) : null}
+
+          <CostComparison distance={distance} energyKwh={result.energyUsedKwh} />
         </aside>
       </section>
 
