@@ -115,6 +115,7 @@ function OutlookCard({
   charge,
   moreEfficient,
   compact,
+  reserveChargeSpace,
 }: {
   car: EvCar;
   estimate: TripEstimate;
@@ -123,6 +124,7 @@ function OutlookCard({
   charge: ReturnType<typeof getChargeRecommendation>;
   moreEfficient: boolean;
   compact?: boolean;
+  reserveChargeSpace?: boolean;
 }) {
   const gauge = Math.min(100, Math.max(0, estimate.endBatteryPct));
   const status = estimate.arrivalStatus;
@@ -173,15 +175,17 @@ function OutlookCard({
         </div>
       </div>
 
-      {charge ? (
-        <div className="charge-tip" role="note">
-          <span>Fast Charge</span>
-          <p>
-            Add ~{charge.kwhNeeded.toFixed(1)} kWh (~{charge.minutes} min) to arrive near a{" "}
-            {charge.targetBufferPct}% buffer.
-          </p>
-        </div>
-      ) : null}
+      <div className={`charge-tip-slot${reserveChargeSpace ? " reserved" : ""}`}>
+        {charge ? (
+          <div className="charge-tip" role="note">
+            <span>Fast Charge</span>
+            <p>
+              Add ~{charge.kwhNeeded.toFixed(1)} kWh (~{charge.minutes} min) to arrive near a{" "}
+              {charge.targetBufferPct}% buffer.
+            </p>
+          </div>
+        ) : null}
+      </div>
 
       <div className={`tip-card tone-${status}`}>
         <span>GOOD TO KNOW</span>
@@ -266,11 +270,7 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#top" aria-label="EV Range Lab home">
           <span className="brand-mark" aria-hidden="true">
-            <span className="pixel-car-roof" />
-            <span className="pixel-car-body" />
-            <span className="pixel-wheel wheel-left" />
-            <span className="pixel-wheel wheel-right" />
-            <span className="pixel-charge" />
+            <span className="brand-car" />
           </span>
           <span>Range Lab</span>
         </a>
@@ -312,6 +312,7 @@ export default function Home() {
           width={1728}
           height={909}
           priority
+          unoptimized
           sizes="(max-width: 1440px) 100vw, 1440px"
         />
         <div className="hero-note hero-note-overlay">
@@ -447,6 +448,7 @@ export default function Home() {
               charge={charge}
               moreEfficient={winnerId === car.id}
               compact={viewMode === "compare"}
+              reserveChargeSpace={viewMode === "compare" && Boolean(charge || chargeB)}
             />
             {viewMode === "compare" ? (
               <OutlookCard
@@ -457,6 +459,7 @@ export default function Home() {
                 charge={chargeB}
                 moreEfficient={winnerId === carB.id}
                 compact
+                reserveChargeSpace={Boolean(charge || chargeB)}
               />
             ) : null}
           </div>
