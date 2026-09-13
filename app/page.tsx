@@ -126,18 +126,26 @@ function VehiclePicker({
   onChange: (id: string) => void;
   specs: EvCar;
 }) {
+  const makes = Array.from(new Set(cars.map((item) => item.make)));
+
   return (
     <div className="vehicle-picker">
       <label className="select-label" htmlFor={id}>
         {label}
         <select id={id} value={carId} onChange={(event) => onChange(event.target.value)}>
-          {cars.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
+          {makes.map((make) => (
+            <optgroup key={make} label={make}>
+              {cars.filter((item) => item.make === make).map((item) => (
+                <option key={item.id} value={item.id}>{item.name}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </label>
+      <div className="vehicle-card-heading" style={{ "--car-accent": specs.accent } as CSSProperties}>
+        <CarSilhouette car={specs} />
+        <span><small>{specs.make}</small><strong>{specs.shortName}</strong></span>
+      </div>
       <div className="car-specs">
         <span>
           <small>Usable battery</small>
@@ -149,6 +157,16 @@ function VehiclePicker({
         </span>
       </div>
     </div>
+  );
+}
+
+function CarSilhouette({ car }: { car: EvCar }) {
+  return (
+    <span className={`mini-car ${car.bodyStyle}`} aria-hidden="true">
+      <span className="mini-car-body" />
+      <span className="mini-wheel front" />
+      <span className="mini-wheel rear" />
+    </span>
   );
 }
 
@@ -184,7 +202,7 @@ function OutlookCard({
     >
       <div className="result-top">
         <div className="outlook-identity">
-          <span className="outlook-car">{car.shortName}</span>
+          <span className="outlook-car-line"><CarSilhouette car={car} /><span className="outlook-car">{car.shortName}</span></span>
           {moreEfficient ? <span className="efficient-badge">More efficient</span> : null}
         </div>
         <span className={`status ${statusClass(status)}`} role="status">
