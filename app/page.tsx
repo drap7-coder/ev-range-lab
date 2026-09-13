@@ -345,6 +345,8 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="EV Range Lab home">
           <span className="brand-mark" aria-hidden="true">
             <span className="brand-car" />
+            <span className="brand-wheel rear" />
+            <span className="brand-wheel front" />
           </span>
           <span className="brand-name">EV Range Lab</span>
         </a>
