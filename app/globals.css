@@ -463,7 +463,18 @@ input[type="range"]::-webkit-slider-thumb {
   flex-direction: column;
   animation: rise-in 0.45s ease both;
 }
-.outlook-stack.dual .result-top { min-height: 58px; }
+.outlook-stack.dual .outlook-card {
+  padding: clamp(14px, 1.5vw, 20px);
+  border: 1px solid rgba(113, 229, 218, 0.2);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(17, 24, 32, 0.98), rgba(8, 14, 19, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 14px 34px rgba(0, 0, 0, 0.16);
+}
+.outlook-stack.dual .outlook-card.is-efficient {
+  border-color: rgba(189, 255, 89, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 0 28px rgba(189, 255, 89, 0.07);
+}
+.outlook-stack.dual .result-top { min-height: 82px; }
 .outlook-stack.dual .outlook-card:nth-child(2) { animation-delay: 0.08s; }
 .outlook-identity {
   display: flex;
@@ -912,7 +923,7 @@ footer p {
 
 @media (max-width: 1100px) {
   .outlook-stack.dual { grid-template-columns: 1fr; }
-  .outlook-stack.dual .result-top { min-height: 0; }
+  .outlook-stack.dual .result-top { min-height: 82px; }
   .outlook-stack.dual .charge-tip-slot.reserved { min-height: 0; }
   .compare-pickers { grid-template-columns: 1fr; }
   .geo-row { grid-template-columns: 1fr; }
