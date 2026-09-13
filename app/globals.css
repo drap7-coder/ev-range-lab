@@ -1001,10 +1001,8 @@ footer p {
 }
 
 @media (max-width: 1100px) {
-  .outlook-stack.dual { grid-template-columns: 1fr; }
   .outlook-stack.dual .result-top { min-height: 82px; }
   .outlook-stack.dual .charge-tip-slot.reserved { min-height: 0; }
-  .compare-pickers { grid-template-columns: 1fr; }
   .geo-row { grid-template-columns: 1fr; }
 }
 
@@ -1028,12 +1026,44 @@ footer p {
   .lede { font-size: 16px; }
   .controls-panel,
   .results-panel { padding: 26px 20px; }
+  .compare-pickers { gap: 8px; }
+  .compare-pickers select { padding: 11px 28px 11px 10px; font-size: 11px; }
+  .compare-pickers .vehicle-card-heading { min-height: 72px; padding: 9px; gap: 6px; align-items: flex-start; flex-direction: column; }
+  .compare-pickers .vehicle-card-heading strong { max-width: 100%; font-size: 12px; }
+  .compare-pickers .car-specs span { padding: 10px 8px; }
+  .compare-pickers .car-specs small { font-size: 8px; }
+  .compare-pickers .car-specs strong { font-size: 12px; }
+  .compare-pickers .mini-car { width: 40px; height: 22px; flex-basis: 22px; }
   .field-grid { grid-template-columns: 1fr; gap: 18px; }
   .preset-row { grid-template-columns: 1fr; }
   .preset-row button { min-height: 0; }
   .cost-grid { grid-template-columns: 1fr; }
   .battery-visual { width: min(100%, 320px); height: auto; }
   .battery-copy strong { font-size: 76px; }
+  .outlook-stack.dual { gap: 8px; }
+  .outlook-stack.dual .outlook-card { padding: 10px 8px; border-radius: 10px; }
+  .outlook-stack.dual .result-top {
+    min-height: 126px;
+    display: grid;
+    grid-template-rows: 48px 70px;
+    gap: 8px;
+  }
+  .outlook-stack.dual .outlook-car-line { gap: 5px; }
+  .outlook-stack.dual .outlook-car-line .mini-car { width: 34px; height: 20px; flex-basis: 34px; }
+  .outlook-stack.dual .outlook-car { font-size: 9px; letter-spacing: .04em; }
+  .outlook-stack.dual .efficient-badge { padding: 3px 5px; font-size: 7px; }
+  .outlook-stack.dual .status { width: 100%; max-width: none; padding: 8px; font-size: 10px; text-align: left; }
+  .outlook-card.compact .battery-visual { width: min(100%, 142px); margin-top: 14px; }
+  .outlook-card.compact .battery-copy small { font-size: 7px; }
+  .outlook-card.compact .battery-copy strong { font-size: 42px; }
+  .outlook-card.compact .battery-copy span { margin-top: 4px; font-size: 9px; }
+  .outlook-stack.dual .tank-equivalent { padding: 10px 8px; }
+  .outlook-stack.dual .tank-label small { font-size: 8px; }
+  .outlook-stack.dual .tank-label strong { font-size: 11px; }
+  .outlook-stack.dual .metrics small { font-size: 8px; }
+  .outlook-stack.dual .metrics strong { font-size: 11px; }
+  .outlook-stack.dual .tip-card { padding: 12px 10px; }
+  .outlook-stack.dual .tip-card p { font-size: 11px; }
   .metrics { grid-template-columns: 1fr; }
   .metrics div + div {
     border-left: 0;
