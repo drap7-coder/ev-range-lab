@@ -328,7 +328,7 @@ export default function Home() {
           <span className="brand-mark" aria-hidden="true">
             <span className="brand-car" />
           </span>
-          <span>EV Range Lab</span>
+          <span className="brand-name">EV Range Lab</span>
         </a>
         <div className="header-controls">
           <div className="mode-toggle" role="group" aria-label="Vehicle view">
