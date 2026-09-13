@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
+import Image from "next/image";
 import { cars, DEFAULT_CAR, type EvCar } from "@/lib/ev/cars";
 import {
   estimateTrip,
@@ -264,7 +265,13 @@ export default function Home() {
     <main>
       <header className="site-header">
         <a className="brand" href="#top" aria-label="EV Range Lab home">
-          <span className="brand-mark">EV</span>
+          <span className="brand-mark" aria-hidden="true">
+            <span className="pixel-car-roof" />
+            <span className="pixel-car-body" />
+            <span className="pixel-wheel wheel-left" />
+            <span className="pixel-wheel wheel-right" />
+            <span className="pixel-charge" />
+          </span>
           <span>Range Lab</span>
         </a>
         <div className="header-controls">
@@ -297,20 +304,19 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="hero" id="top">
-        <div>
-          <p className="eyebrow">Range without the guesswork</p>
-          <h1>
-            See how far your EV can <em>really</em> go.
-          </h1>
-          <p className="lede">
-            Pick a car, shape the drive, and watch conditions change the outcome. Compare models, catch low-buffer trips early, and
-            stress-test climbs before you leave.
-          </p>
-        </div>
-        <div className="hero-note">
+      <section className="hero hero-visual" id="top" aria-label="EV Range Lab introduction">
+        <Image
+          className="hero-image"
+          src="/hero-silhouette.png"
+          alt="EV Range Lab — See how far your EV can really go, with a generic pixel-art electric car silhouette and battery gauge"
+          width={1728}
+          height={909}
+          priority
+          sizes="(max-width: 1440px) 100vw, 1440px"
+        />
+        <div className="hero-note hero-note-overlay">
           <span>LIVE MODEL</span>
-          <p>One shared set of conditions. Every estimate updates together.</p>
+          <p>Compare cars, terrain, speed, and weather below.</p>
         </div>
       </section>
 
