@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
-import { BrandMark } from "@/app/brand-mark";
 import { cars, DEFAULT_CAR } from "@/lib/ev/cars";
 import { estimateTrip, getPlainTip, type Climate, type Hills } from "@/lib/ev/model";
 
@@ -40,7 +39,7 @@ export default function Home() {
   return (
     <main>
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="EV Range Lab home"><BrandMark /><span className="brand-wordmark"><span className="brand-ev">EV</span> Range Lab</span></a>
+        <a className="brand" href="#top" aria-label="EV Range Lab home"><span className="brand-mark">EV</span><span>Range Lab</span></a>
         <div className="mode-toggle" aria-label="View mode">
           <button className={!expert ? "active" : ""} onClick={() => setExpert(false)}>Learn</button>
           <button className={expert ? "active" : ""} onClick={() => setExpert(true)}>Expert</button>
