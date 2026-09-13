@@ -1,6 +1,6 @@
 /**
- * Pixel EV + battery brand mark (IQ Bulls–style retro-tech silhouette).
- * Uses the raster sprite so Minecraft-like pixels stay crisp via CSS.
+ * Header mark cropped from the evolved logo banner (silhouette car).
+ * Same art as `public/og.png` — not a separate icon system.
  */
 export function BrandMark({ className = "brand-mark" }: { className?: string }) {
   return (
