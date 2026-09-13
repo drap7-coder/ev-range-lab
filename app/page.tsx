@@ -195,10 +195,11 @@ function OutlookCard({
       <div
         className="battery-visual"
         aria-label={`Estimated arrival battery ${Math.round(estimate.endBatteryPct)} percent`}
+        style={{ "--gauge-angle": `${gauge * 3.6}deg` } as CSSProperties}
       >
-        <div className={`battery-fill tone-${status}`} style={{ height: `${gauge}%` }} />
+        <div className={`energy-core tone-${status}`} aria-hidden="true" />
         <div className="battery-copy">
-          <small>ARRIVE WITH</small>
+          <small>ARRIVAL ENERGY</small>
           <strong>
             {Math.round(estimate.endBatteryPct)}
             <sup>%</sup>
@@ -327,7 +328,7 @@ export default function Home() {
           <span className="brand-mark" aria-hidden="true">
             <span className="brand-car" />
           </span>
-          <span>Range Lab</span>
+          <span>EV Range Lab</span>
         </a>
         <div className="header-controls">
           <div className="mode-toggle" role="group" aria-label="Vehicle view">
