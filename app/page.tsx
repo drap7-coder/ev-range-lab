@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import { cars, DEFAULT_CAR, type EvCar } from "@/lib/ev/cars";
 import {
@@ -209,7 +209,6 @@ export default function Home() {
   const [load, setLoad] = useState(250);
   const [elevationGainFt, setElevationGainFt] = useState(0);
   const [expert, setExpert] = useState(false);
-  const [, startTransition] = useTransition();
 
   const car = cars.find((item) => item.id === carId) ?? DEFAULT_CAR;
   const carB = cars.find((item) => item.id === carIdB) ?? cars[1] ?? DEFAULT_CAR;
@@ -243,16 +242,14 @@ export default function Home() {
       : null;
 
   function patchInputs(next: TripInputs) {
-    startTransition(() => {
-      setDistance(next.distanceMi);
-      setBattery(next.startBatteryPct);
-      setTemperature(next.temperatureF);
-      setSpeed(next.averageSpeedMph);
-      setHills(next.hills);
-      setClimate(next.climate);
-      setLoad(next.loadLb);
-      setElevationGainFt(next.elevationGainFt);
-    });
+    setDistance(next.distanceMi);
+    setBattery(next.startBatteryPct);
+    setTemperature(next.temperatureF);
+    setSpeed(next.averageSpeedMph);
+    setHills(next.hills);
+    setClimate(next.climate);
+    setLoad(next.loadLb);
+    setElevationGainFt(next.elevationGainFt);
   }
 
   function onRoutePreset(id: RoutePresetId) {

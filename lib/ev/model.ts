@@ -144,9 +144,10 @@ export function getChargeRecommendation(car: EvCar, estimate: TripEstimate): Cha
 }
 
 export function getPlainTip(inputs: TripInputs, estimate: TripEstimate, carName?: string) {
-  const who = carName ? `${carName} ` : "";
   if (estimate.arrivalStatus === "insufficient") {
-    return `${who}won't make it on this charge. Plan a Fast Charge stop—or shorten the trip—before you leave.`;
+    return carName
+      ? `${carName} won't make it on this charge. Plan a Fast Charge stop—or shorten the trip—before you leave.`
+      : "This trip won't make it on this charge. Plan a Fast Charge stop—or shorten the trip—before you leave.";
   }
   if (estimate.arrivalStatus === "low") {
     return `You'll arrive with a thin cushion. A short Fast Charge on the way keeps you above a comfortable ${TARGET_BUFFER_PCT}% buffer.`;
