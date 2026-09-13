@@ -3,7 +3,7 @@
 import { useId, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import { cars, DEFAULT_CAR, type EvCar } from "@/lib/ev/cars";
+import { cars, DEFAULT_CAR, getShopSpec, type EvCar } from "@/lib/ev/cars";
 import {
   estimateTrip,
   getArrivalStatusLabel,
@@ -27,7 +27,10 @@ import {
   type RoutePresetId,
 } from "@/lib/ev/presets";
 
-type ViewMode = "single" | "compare";
+type ViewMode = "single" | "compare" | "shop";
+type ShopBody = "any" | EvCar["bodyStyle"];
+type ShopPriority = "balanced" | "range" | "value" | "charging";
+type ShopMatch = { car: EvCar; score: number; realRange: number; reason: string };
 
 function RangeControl({
   label,
@@ -269,6 +272,82 @@ function OutlookCard({
   );
 }
 
+function ShoppingProfile({
+  budget,
+  body,
+  seats,
+  homeCharging,
+  priority,
+  onBudget,
+  onBody,
+  onSeats,
+  onHomeCharging,
+  onPriority,
+}: {
+  budget: number;
+  body: ShopBody;
+  seats: number;
+  homeCharging: boolean;
+  priority: ShopPriority;
+  onBudget: (value: number) => void;
+  onBody: (value: ShopBody) => void;
+  onSeats: (value: number) => void;
+  onHomeCharging: (value: boolean) => void;
+  onPriority: (value: ShopPriority) => void;
+}) {
+  return (
+    <div className="shop-profile">
+      <RangeControl label="Maximum budget" help="We use an illustrative starting price before incentives, taxes, and options." value={budget / 1000} min={35} max={130} step={5} unit="k" onChange={(value) => onBudget(value * 1000)} />
+      <div className="shop-field-grid">
+        <label className="select-label">Body style
+          <select value={body} onChange={(event) => onBody(event.target.value as ShopBody)}>
+            <option value="any">Any body style</option><option value="sedan">Sedan</option><option value="crossover">Crossover</option><option value="suv">SUV</option><option value="truck">Truck</option>
+          </select>
+        </label>
+        <label className="select-label">Seats needed
+          <select value={seats} onChange={(event) => onSeats(Number(event.target.value))}>
+            <option value={4}>4 or more</option><option value={5}>5 or more</option><option value={7}>7 seats</option>
+          </select>
+        </label>
+        <label className="select-label">Top priority
+          <select value={priority} onChange={(event) => onPriority(event.target.value as ShopPriority)}>
+            <option value="balanced">Balanced match</option><option value="range">Longest range</option><option value="value">Best value</option><option value="charging">Fast charging</option>
+          </select>
+        </label>
+        <fieldset className="charge-at-home">
+          <legend>Home charging</legend>
+          <button type="button" className={homeCharging ? "active" : ""} aria-pressed={homeCharging} onClick={() => onHomeCharging(true)}>Available</button>
+          <button type="button" className={!homeCharging ? "active" : ""} aria-pressed={!homeCharging} onClick={() => onHomeCharging(false)}>Not available</button>
+        </fieldset>
+      </div>
+      <p className="shop-note">Adjust the trip conditions below and your matches will respond to your real driving life.</p>
+    </div>
+  );
+}
+
+function ShoppingResults({ matches, onCompare }: { matches: ShopMatch[]; onCompare: (first: EvCar, second: EvCar) => void }) {
+  return (
+    <div className="shop-results">
+      <div className="shop-results-heading"><span>YOUR BEST MATCHES</span><h2>Three EVs worth a closer look.</h2><p>Ranked for your needs and the conditions selected on this page.</p></div>
+      <div className="shop-match-list">
+        {matches.map((match, index) => {
+          const spec = getShopSpec(match.car);
+          return (
+            <article className="shop-match" key={match.car.id} style={{ "--car-accent": match.car.accent } as CSSProperties}>
+              <div className="shop-rank">0{index + 1}</div>
+              <div className="shop-match-title"><CarSilhouette car={match.car} /><div><small>{match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
+              <div className="shop-match-metrics"><span><small>From</small><strong>~${Math.round(spec.startingPriceUsd / 1000)}k</strong></span><span><small>Real-life range</small><strong>~{match.realRange} mi</strong></span><span><small>Seats</small><strong>{spec.seats}</strong></span><span><small>DC peak</small><strong>{spec.dcFastChargeKw} kW</strong></span></div>
+              <p>{match.reason}</p>
+            </article>
+          );
+        })}
+      </div>
+      {matches.length >= 2 ? <button className="compare-matches" type="button" onClick={() => onCompare(matches[0].car, matches[1].car)}>Compare the top two</button> : null}
+      <p className="shopping-disclaimer">Shopping data is illustrative and can change by trim, options, incentives, and model year. Confirm pricing and specifications with the manufacturer before purchasing.</p>
+    </div>
+  );
+}
+
 function statusClass(status: ArrivalStatus) {
   if (status === "insufficient") return "danger";
   if (status === "low") return "caution";
@@ -288,6 +367,11 @@ export default function Home() {
   const [load, setLoad] = useState(250);
   const [elevationGainFt, setElevationGainFt] = useState(0);
   const [expert, setExpert] = useState(false);
+  const [shopBudget, setShopBudget] = useState(60000);
+  const [shopBody, setShopBody] = useState<ShopBody>("any");
+  const [shopSeats, setShopSeats] = useState(5);
+  const [homeCharging, setHomeCharging] = useState(true);
+  const [shopPriority, setShopPriority] = useState<ShopPriority>("balanced");
 
   const car = cars.find((item) => item.id === carId) ?? DEFAULT_CAR;
   const carB = cars.find((item) => item.id === carIdB) ?? cars[1] ?? DEFAULT_CAR;
@@ -319,6 +403,32 @@ export default function Home() {
     viewMode === "compare"
       ? getMoreEfficientCarId({ carId: car.id, whPerMi: result.whPerMi }, { carId: carB.id, whPerMi: resultB.whPerMi })
       : null;
+
+  const shopMatches = useMemo<ShopMatch[]>(() => cars.map((candidate) => {
+    const spec = getShopSpec(candidate);
+    const estimate = estimateTrip(candidate, inputs);
+    const realRange = Math.max(0, Math.round((candidate.usableBatteryKwh * 1000) / estimate.whPerMi));
+    const budgetFit = spec.startingPriceUsd <= shopBudget ? 30 : Math.max(0, 30 - ((spec.startingPriceUsd - shopBudget) / 2000));
+    const bodyFit = shopBody === "any" || candidate.bodyStyle === shopBody ? 18 : 0;
+    const seatFit = spec.seats >= shopSeats ? 14 : 0;
+    const rangeWeight = shopPriority === "range" ? 30 : 20;
+    const valueWeight = shopPriority === "value" ? 18 : 8;
+    const chargeWeight = shopPriority === "charging" || !homeCharging ? 18 : 10;
+    const rangeFit = Math.min(rangeWeight, (realRange / 450) * rangeWeight);
+    const valueFit = Math.min(valueWeight, (realRange / Math.max(1, spec.startingPriceUsd / 1000)) * (valueWeight / 7));
+    const chargeFit = Math.min(chargeWeight, (spec.dcFastChargeKw / 300) * chargeWeight);
+    const total = budgetFit + bodyFit + seatFit + rangeFit + valueFit + chargeFit;
+    const max = 30 + 18 + 14 + rangeWeight + valueWeight + chargeWeight;
+    const score = Math.max(1, Math.min(99, Math.round((total / max) * 100)));
+    const reason = spec.startingPriceUsd > shopBudget
+      ? `Strong capability, but its illustrative starting price is about $${Math.round((spec.startingPriceUsd - shopBudget) / 1000)}k over your budget.`
+      : shopPriority === "range"
+        ? `A standout for distance, with about ${realRange} miles under the conditions you selected.`
+        : !homeCharging && spec.dcFastChargeKw >= 220
+          ? `Its strong DC charging rate makes life without a home charger easier.`
+          : `${candidate.bodyStyle === shopBody || shopBody === "any" ? "Fits your preferred shape" : "A smart alternative shape"} with a useful balance of range, price, and charging.`;
+    return { car: candidate, score, realRange, reason };
+  }).sort((a, b) => b.score - a.score).slice(0, 3), [inputs, shopBudget, shopBody, shopSeats, homeCharging, shopPriority]);
 
   function patchInputs(next: TripInputs) {
     setDistance(next.distanceMi);
@@ -368,6 +478,7 @@ export default function Home() {
             >
               Compare
             </button>
+            <button type="button" className={viewMode === "shop" ? "active" : ""} aria-pressed={viewMode === "shop"} onClick={() => setViewMode("shop")}>Shop</button>
           </div>
           <div className="mode-toggle subtle" role="group" aria-label="Detail level">
             <button type="button" className={!expert ? "active" : ""} aria-pressed={!expert} onClick={() => setExpert(false)}>
@@ -402,12 +513,14 @@ export default function Home() {
           <div className="section-heading">
             <span>01</span>
             <div>
-              <p>Choose your EV</p>
-              <h2>{viewMode === "compare" ? "Compare models" : car.shortName}</h2>
+              <p>{viewMode === "shop" ? "Find your EV" : "Choose your EV"}</p>
+              <h2>{viewMode === "compare" ? "Compare models" : viewMode === "shop" ? "What fits your life?" : car.shortName}</h2>
             </div>
           </div>
 
-          {viewMode === "single" ? (
+          {viewMode === "shop" ? (
+            <ShoppingProfile budget={shopBudget} body={shopBody} seats={shopSeats} homeCharging={homeCharging} priority={shopPriority} onBudget={setShopBudget} onBody={setShopBody} onSeats={setShopSeats} onHomeCharging={setHomeCharging} onPriority={setShopPriority} />
+          ) : viewMode === "single" ? (
             <VehiclePicker id="vehicle-a" label="Vehicle" carId={carId} onChange={setCarId} specs={car} />
           ) : (
             <div className="compare-pickers">
@@ -516,7 +629,11 @@ export default function Home() {
           <RangeControl label="Passengers + cargo" help="More people and luggage add weight. The effect is usually smaller than speed or temperature." value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
         </div>
 
-        <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}`}>
+        <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}${viewMode === "shop" ? " shopping" : ""}`}>
+          {viewMode === "shop" ? (
+            <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
+          ) : (
+          <>
           <div className={`outlook-stack${viewMode === "compare" ? " dual" : ""}`}>
             <OutlookCard
               car={car}
@@ -576,6 +693,8 @@ export default function Home() {
           ) : null}
 
           <CostComparison distance={distance} energyKwh={result.energyUsedKwh} />
+          </>
+          )}
         </aside>
       </section>
 

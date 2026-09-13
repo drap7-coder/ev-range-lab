@@ -838,6 +838,37 @@ input[type="range"]::-webkit-slider-thumb {
   margin: 16px 0 0;
 }
 
+.shop-profile { display: grid; gap: 20px; }
+.shop-field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.charge-at-home { margin: 0; padding: 0; border: 0; }
+.charge-at-home legend { margin-bottom: 8px; color: #9cafaa; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.charge-at-home button { width: 50%; min-height: 48px; padding: 8px; color: #9cafaa; border: 1px solid rgba(113,229,218,.18); background: #111820; font-family: var(--font-mono); font-size: 10px; }
+.charge-at-home button:first-of-type { border-radius: 8px 0 0 8px; }
+.charge-at-home button:last-of-type { border-left: 0; border-radius: 0 8px 8px 0; }
+.charge-at-home button.active { color: #07100e; background: #71e5da; }
+.shop-note { margin: 0; padding: 13px 15px; color: #a7b9b3; border-left: 2px solid var(--lime); background: rgba(189,255,89,.06); font-size: 12px; line-height: 1.5; }
+.results-panel.shopping { min-height: 0; }
+.shop-results-heading > span { color: var(--lime); font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; }
+.shop-results-heading h2 { margin: 8px 0; font-size: clamp(26px,3vw,40px); line-height: 1; letter-spacing: -.05em; }
+.shop-results-heading p { margin: 0 0 22px; color: #9fb0aa; font-size: 13px; line-height: 1.5; }
+.shop-match-list { display: grid; gap: 12px; }
+.shop-match { position: relative; overflow: hidden; padding: 18px; border: 1px solid rgba(113,229,218,.18); border-radius: 12px; background: linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.02)); }
+.shop-match:first-child { border-color: color-mix(in srgb,var(--car-accent) 50%,transparent); box-shadow: 0 0 26px color-mix(in srgb,var(--car-accent) 8%,transparent); }
+.shop-rank { position: absolute; top: 10px; right: 12px; color: rgba(255,255,255,.08); font: 700 38px/1 var(--font-mono); }
+.shop-match-title { position: relative; display: flex; align-items: center; gap: 10px; padding-right: 48px; }
+.shop-match-title > div { min-width: 0; flex: 1; }
+.shop-match-title small { color: #91a39d; font: 700 9px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+.shop-match-title h3 { margin: 3px 0 0; font-size: 18px; letter-spacing: -.03em; }
+.shop-match-title > strong { color: var(--car-accent); font: 700 11px/1 var(--font-mono); white-space: nowrap; }
+.shop-match-metrics { display: grid; grid-template-columns: repeat(4,1fr); margin-top: 15px; border: 1px solid rgba(255,255,255,.12); border-radius: 8px; }
+.shop-match-metrics span { padding: 10px; display: flex; flex-direction: column; gap: 4px; }
+.shop-match-metrics span + span { border-left: 1px solid rgba(255,255,255,.12); }
+.shop-match-metrics small { color: #8fa099; font-size: 8px; letter-spacing: .06em; text-transform: uppercase; }
+.shop-match-metrics strong { font-size: 12px; }
+.shop-match > p { margin: 14px 0 0; color: #c6d1cd; font-size: 12px; line-height: 1.45; }
+.compare-matches { width: 100%; margin-top: 14px; padding: 14px; color: #07100e; border: 0; border-radius: 9px; background: var(--lime); font-weight: 800; }
+.shopping-disclaimer { margin: 14px 0 0; color: #758984; font-size: 9px; line-height: 1.45; }
+
 /* Dark cockpit system, adapted from IQBulls' restrained data-dashboard language. */
 body {
   background:
@@ -1035,6 +1066,13 @@ footer p {
   .compare-pickers .car-specs strong { font-size: 12px; }
   .compare-pickers .mini-car { width: 40px; height: 22px; flex-basis: 22px; }
   .field-grid { grid-template-columns: 1fr; gap: 18px; }
+  .shop-field-grid { grid-template-columns: 1fr; }
+  .shop-match { padding: 14px 12px; }
+  .shop-match-title { padding-right: 0; flex-wrap: wrap; }
+  .shop-match-title > strong { margin-left: auto; }
+  .shop-match-metrics { grid-template-columns: 1fr 1fr; }
+  .shop-match-metrics span:nth-child(3) { border-left: 0; border-top: 1px solid rgba(255,255,255,.12); }
+  .shop-match-metrics span:nth-child(4) { border-top: 1px solid rgba(255,255,255,.12); }
   .preset-row { grid-template-columns: 1fr; }
   .preset-row button { min-height: 0; }
   .cost-grid { grid-template-columns: 1fr; }

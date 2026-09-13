@@ -42,3 +42,44 @@ export const cars: EvCar[] = [
 ];
 
 export const DEFAULT_CAR = cars[0];
+
+export type EvShopSpec = {
+  startingPriceUsd: number;
+  seats: number;
+  dcFastChargeKw: number;
+};
+
+const shopSpecs: Record<string, EvShopSpec> = {
+  "model-3-lr": { startingPriceUsd: 47500, seats: 5, dcFastChargeKw: 250 },
+  "model-s": { startingPriceUsd: 85000, seats: 5, dcFastChargeKw: 250 },
+  "model-y": { startingPriceUsd: 49000, seats: 5, dcFastChargeKw: 250 },
+  "model-x": { startingPriceUsd: 90000, seats: 7, dcFastChargeKw: 250 },
+  cybertruck: { startingPriceUsd: 80000, seats: 5, dcFastChargeKw: 325 },
+  "hummer-pickup": { startingPriceUsd: 98000, seats: 5, dcFastChargeKw: 300 },
+  "hummer-suv": { startingPriceUsd: 96000, seats: 5, dcFastChargeKw: 300 },
+  "volvo-ex30": { startingPriceUsd: 39000, seats: 5, dcFastChargeKw: 175 },
+  "volvo-ex40": { startingPriceUsd: 53000, seats: 5, dcFastChargeKw: 205 },
+  "volvo-ex90": { startingPriceUsd: 80000, seats: 7, dcFastChargeKw: 250 },
+  "lucid-air-pure": { startingPriceUsd: 70000, seats: 5, dcFastChargeKw: 250 },
+  "lucid-air-gt": { startingPriceUsd: 111000, seats: 5, dcFastChargeKw: 300 },
+  "lucid-gravity": { startingPriceUsd: 95000, seats: 7, dcFastChargeKw: 400 },
+  "ioniq-5": { startingPriceUsd: 52000, seats: 5, dcFastChargeKw: 235 },
+  "ioniq-6": { startingPriceUsd: 43000, seats: 5, dcFastChargeKw: 235 },
+  "mach-e": { startingPriceUsd: 51000, seats: 5, dcFastChargeKw: 150 },
+  "f150-lightning": { startingPriceUsd: 70000, seats: 5, dcFastChargeKw: 180 },
+  "rivian-r1s": { startingPriceUsd: 76000, seats: 7, dcFastChargeKw: 220 },
+  ev9: { startingPriceUsd: 59000, seats: 7, dcFastChargeKw: 210 },
+  ev6: { startingPriceUsd: 46000, seats: 5, dcFastChargeKw: 235 },
+  id4: { startingPriceUsd: 45000, seats: 5, dcFastChargeKw: 175 },
+  equinox: { startingPriceUsd: 44000, seats: 5, dcFastChargeKw: 150 },
+  lyriq: { startingPriceUsd: 62000, seats: 5, dcFastChargeKw: 190 },
+  "bmw-ix": { startingPriceUsd: 89000, seats: 5, dcFastChargeKw: 195 },
+  "audi-q6": { startingPriceUsd: 66000, seats: 5, dcFastChargeKw: 270 },
+  "eqs-suv": { startingPriceUsd: 105000, seats: 7, dcFastChargeKw: 200 },
+  "taycan-4s": { startingPriceUsd: 119000, seats: 4, dcFastChargeKw: 320 },
+  leaf: { startingPriceUsd: 37000, seats: 5, dcFastChargeKw: 100 },
+};
+
+export function getShopSpec(car: EvCar): EvShopSpec {
+  return shopSpecs[car.id] ?? { startingPriceUsd: 60000, seats: 5, dcFastChargeKw: 150 };
+}
