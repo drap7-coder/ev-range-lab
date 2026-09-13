@@ -39,7 +39,16 @@ export default function Home() {
   return (
     <main>
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="EV Range Lab home"><span className="brand-mark">EV</span><span>Range Lab</span></a>
+        <a className="brand" href="#top" aria-label="EV Range Lab home">
+          <span className="brand-mark" aria-hidden="true">
+            <span className="pixel-car-roof" />
+            <span className="pixel-car-body" />
+            <span className="pixel-wheel wheel-left" />
+            <span className="pixel-wheel wheel-right" />
+            <span className="pixel-charge" />
+          </span>
+          <span>Range Lab</span>
+        </a>
         <div className="mode-toggle" aria-label="View mode">
           <button className={!expert ? "active" : ""} onClick={() => setExpert(false)}>Learn</button>
           <button className={expert ? "active" : ""} onClick={() => setExpert(true)}>Expert</button>
