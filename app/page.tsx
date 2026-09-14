@@ -537,6 +537,12 @@ export default function Home() {
             </div>
           )}
 
+          {viewMode === "shop" ? (
+            <div className="mobile-shopping-results">
+              <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
+            </div>
+          ) : null}
+
           <div className="section-heading compact">
             <span>02</span>
             <div>
@@ -631,7 +637,9 @@ export default function Home() {
 
         <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}${viewMode === "shop" ? " shopping" : ""}`}>
           {viewMode === "shop" ? (
-            <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
+            <div className="desktop-shopping-results">
+              <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
+            </div>
           ) : (
           <>
           <div className={`outlook-stack${viewMode === "compare" ? " dual" : ""}`}>
