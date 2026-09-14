@@ -667,20 +667,25 @@ export default function Home() {
       </section>
 
       <section className="how-it-works">
-        <p className="eyebrow">What changes range?</p>
-        <h2>Three forces do most of the work.</h2>
-        <div className="explain-grid">
-          <article>
+        <div className="explain-heading">
+          <div>
+            <p className="eyebrow">What changes range?</p>
+            <h2>Three forces do most of the work.</h2>
+          </div>
+          <p className="scroll-cue" aria-hidden="true"><span>Scroll to explore</span><i>→</i></p>
+        </div>
+        <div className="explain-grid" role="list" aria-label="The three biggest forces affecting EV range">
+          <article role="listitem">
             <span>01</span>
             <h3>Air gets expensive</h3>
             <p>At highway speed, pushing air aside takes much more energy. Slowing down is often your most powerful lever.</p>
           </article>
-          <article>
+          <article role="listitem">
             <span>02</span>
             <h3>Temperature matters</h3>
             <p>Cold batteries deliver less energy, while cabin heat adds demand. Preconditioning while plugged in helps.</p>
           </article>
-          <article>
+          <article role="listitem">
             <span>03</span>
             <h3>Elevation collects a toll</h3>
             <p>Climbing costs energy. Regeneration gives some back downhill, but never all of it—Mountain Pass makes that vivid.</p>
