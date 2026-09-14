@@ -366,7 +366,6 @@ export default function Home() {
   const [climate, setClimate] = useState<Climate>("normal");
   const [load, setLoad] = useState(250);
   const [elevationGainFt, setElevationGainFt] = useState(0);
-  const [expert, setExpert] = useState(false);
   const [shopBudget, setShopBudget] = useState(60000);
   const [shopBody, setShopBody] = useState<ShopBody>("any");
   const [shopSeats, setShopSeats] = useState(5);
@@ -479,14 +478,6 @@ export default function Home() {
               Compare
             </button>
             <button type="button" className={viewMode === "shop" ? "active" : ""} aria-pressed={viewMode === "shop"} onClick={() => setViewMode("shop")}>Shop</button>
-          </div>
-          <div className="mode-toggle subtle" role="group" aria-label="Detail level">
-            <button type="button" className={!expert ? "active" : ""} aria-pressed={!expert} onClick={() => setExpert(false)}>
-              Learn
-            </button>
-            <button type="button" className={expert ? "active" : ""} aria-pressed={expert} onClick={() => setExpert(true)}>
-              Expert
-            </button>
           </div>
         </div>
       </header>
@@ -668,37 +659,6 @@ export default function Home() {
               />
             ) : null}
           </div>
-
-          {expert ? (
-            <div className="expert-panel">
-              <div className="expert-title">
-                <span>Model factors{viewMode === "compare" ? ` · ${car.shortName}` : ""}</span>
-                <small>vs. mild 65 mph baseline</small>
-              </div>
-              {result.factors.map((factor) => (
-                <div className="factor" key={factor.label}>
-                  <span>{factor.label}</span>
-                  <div>
-                    <i style={{ width: `${Math.min(100, Math.max(8, ((factor.multiplier - 0.8) / 0.5) * 100))}%` }} />
-                  </div>
-                  <strong>{factor.multiplier.toFixed(2)}×</strong>
-                </div>
-              ))}
-              <div className="expert-numbers">
-                <span><small>Energy use</small><strong>{result.whPerMi} Wh/mi</strong></span>
-                <span><small>Trip energy</small><strong>{result.energyUsedKwh.toFixed(1)} kWh</strong></span>
-              </div>
-              {result.elevationWhPerMi !== 0 ? (
-                <p className="method-note">
-                  Elevation adds {result.elevationWhPerMi > 0 ? "+" : ""}
-                  {result.elevationWhPerMi} Wh/mi before rounding
-                  {viewMode === "compare" ? ` · ${carB.shortName}: ${resultB.elevationWhPerMi > 0 ? "+" : ""}${resultB.elevationWhPerMi} Wh/mi` : ""}.
-                </p>
-              ) : (
-                <p className="method-note">Factors are broad, rounded estimates—not a physics-grade route simulation.</p>
-              )}
-            </div>
-          ) : null}
 
           <CostComparison distance={distance} energyKwh={result.energyUsedKwh} />
           </>
