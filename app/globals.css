@@ -818,6 +818,180 @@ input[type="range"]::-webkit-slider-thumb {
 .compare-matches { width: 100%; margin-top: 14px; padding: 14px; color: #07100e; border: 0; border-radius: 9px; background: var(--lime); font-weight: 800; }
 .shopping-disclaimer { margin: 14px 0 0; color: #758984; font-size: 9px; line-height: 1.45; }
 
+/* Dimensional card system: layered surfaces, precise highlights, and restrained motion. */
+.outlook-card,
+.shop-match,
+.cost-card,
+.tip-card,
+.tank-equivalent,
+.mobile-shopping-results {
+  isolation: isolate;
+  border: 1px solid rgba(145, 240, 228, 0.16);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), transparent 38%),
+    linear-gradient(160deg, #17212a 0%, #0b1219 54%, #080d12 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 1px 0 0 rgba(255, 255, 255, 0.025),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 2px 2px rgba(0, 0, 0, 0.35),
+    0 14px 30px rgba(0, 0, 0, 0.2);
+}
+.outlook-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(18px, 2vw, 26px);
+  border-radius: 18px;
+}
+.outlook-card::before,
+.shop-match::before,
+.cost-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(420px 170px at 8% -10%, color-mix(in srgb, var(--car-accent, #71e5da) 15%, transparent), transparent 62%),
+    linear-gradient(110deg, transparent 15%, rgba(255, 255, 255, 0.035) 38%, transparent 60%);
+}
+.outlook-card::after,
+.shop-match::after,
+.cost-card::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24);
+}
+.outlook-stack.dual .outlook-card {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), transparent 38%),
+    linear-gradient(160deg, #17212a 0%, #0b1219 54%, #080d12 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 2px 2px rgba(0, 0, 0, 0.35),
+    0 18px 36px rgba(0, 0, 0, 0.24);
+}
+.outlook-stack.dual .outlook-card.is-efficient {
+  border-color: color-mix(in srgb, var(--car-accent) 54%, rgba(255,255,255,.12));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 18px 40px rgba(0, 0, 0, 0.28),
+    0 0 34px color-mix(in srgb, var(--car-accent) 11%, transparent);
+}
+.result-top {
+  position: relative;
+  z-index: 4;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.status {
+  border: 1px solid rgba(113, 229, 218, 0.2);
+  background: linear-gradient(180deg, rgba(113, 229, 218, 0.14), rgba(113, 229, 218, 0.055));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 5px 14px rgba(0,0,0,.2);
+}
+.battery-visual {
+  border-color: color-mix(in srgb, var(--car-accent) 42%, rgba(255,255,255,.12));
+  box-shadow:
+    inset 0 0 38px rgba(0, 0, 0, 0.58),
+    inset 0 0 20px color-mix(in srgb, var(--car-accent) 10%, transparent),
+    0 3px 0 #05080b,
+    0 18px 36px rgba(0, 0, 0, 0.34),
+    0 0 48px color-mix(in srgb, var(--car-accent) 12%, transparent);
+}
+.battery-visual::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 5%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: linear-gradient(145deg, rgba(255,255,255,.12), transparent 22%, transparent 72%, rgba(0,0,0,.34));
+}
+.tank-equivalent,
+.metrics,
+.tip-card,
+.charge-tip,
+.shop-match-metrics {
+  backdrop-filter: blur(12px);
+}
+.tank-equivalent {
+  border-color: rgba(113, 229, 218, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 8px 18px rgba(0,0,0,.16);
+}
+.tank-track {
+  box-shadow: inset 0 2px 5px rgba(0,0,0,.65), 0 1px 0 rgba(255,255,255,.04);
+}
+.tank-track span { box-shadow: 0 0 16px color-mix(in srgb, var(--car-accent) 44%, transparent), inset 0 1px 0 rgba(255,255,255,.45); }
+.metrics {
+  overflow: hidden;
+  border-color: rgba(113, 229, 218, 0.16);
+  background: rgba(4, 9, 13, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055), 0 8px 18px rgba(0,0,0,.14);
+}
+.metrics strong { color: #f5fbf8; text-shadow: 0 0 18px rgba(113,229,218,.12); }
+.tip-card {
+  position: relative;
+  overflow: hidden;
+  border-left: 3px solid var(--lime);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 22px rgba(0,0,0,.18);
+}
+.cost-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.cost-card.ev-card {
+  border-color: rgba(189, 255, 89, 0.36);
+  background: linear-gradient(145deg, rgba(189,255,89,.13), transparent 42%), linear-gradient(160deg, #17221d, #0b1212 58%, #080d12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 14px 30px rgba(0,0,0,.24), 0 0 24px rgba(189,255,89,.07);
+}
+.cost-card strong { color: #f7fcfa; text-shadow: 0 0 20px rgba(113,229,218,.15); }
+.shop-match-list { gap: 16px; perspective: 1200px; }
+.shop-match {
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(255,255,255,.075), transparent 40%), linear-gradient(160deg, #17212a, #0b1219 58%, #080d12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.11), inset 0 -1px 0 rgba(0,0,0,.65), 0 3px 3px rgba(0,0,0,.34), 0 16px 30px rgba(0,0,0,.22);
+  transform: translateZ(0);
+  transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+}
+.shop-match:first-child {
+  border-color: color-mix(in srgb,var(--car-accent) 62%,rgba(255,255,255,.12));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 20px 42px rgba(0,0,0,.3), 0 0 34px color-mix(in srgb,var(--car-accent) 12%,transparent);
+}
+.shop-rank { color: color-mix(in srgb, var(--car-accent) 16%, transparent); text-shadow: 0 0 22px color-mix(in srgb,var(--car-accent) 15%,transparent); }
+.shop-match-title > strong {
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb,var(--car-accent) 35%,transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb,var(--car-accent) 10%,transparent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+.shop-match-metrics {
+  overflow: hidden;
+  border-color: rgba(145,240,228,.14);
+  background: rgba(3,8,12,.38);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+}
+.compare-matches {
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 0 rgba(5,15,12,.3), 0 10px 24px rgba(189,255,89,.16);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .shop-match:hover,
+  .cost-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb,var(--car-accent, #71e5da) 48%,rgba(255,255,255,.1)); box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 24px 44px rgba(0,0,0,.34), 0 0 30px color-mix(in srgb,var(--car-accent, #71e5da) 9%,transparent); }
+  .compare-matches:hover { transform: translateY(-2px); filter: brightness(1.04); box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -2px 0 rgba(5,15,12,.3), 0 15px 30px rgba(189,255,89,.23); }
+}
+.compare-matches:active { transform: translateY(1px); }
+.compare-matches:focus-visible,
+.shop-match:focus-within { outline: 2px solid var(--lime); outline-offset: 3px; }
+
 /* Dark cockpit system, adapted from IQBulls' restrained data-dashboard language. */
 body {
   background:
@@ -894,11 +1068,6 @@ select {
 input[type="range"] { background: #25313a; }
 input[type="range"]::-webkit-slider-thumb { background: #0a1016; border-color: #71e5da; }
 .result-top { font-family: var(--font-mono); }
-.status { border: 1px solid rgba(113, 229, 218, 0.18); background: rgba(113, 229, 218, 0.08); }
-.battery-visual { border-color: rgba(113, 229, 218, 0.25); background: #111820; }
-.tank-equivalent,
-.tip-card,
-.cost-card { border: 1px solid rgba(113, 229, 218, 0.13); background: #111820; }
 .tank-track { height: 10px; background: #273139; }
 .how-it-works { max-width: 1240px; }
 .how-it-works h2 { color: #e8f0ed; }
