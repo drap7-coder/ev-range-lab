@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
-import { cars, DEFAULT_CAR, type EvCar } from "@/lib/ev/cars";
+import Image from "next/image";
+import { cars, DEFAULT_CAR, getShopSpec, type EvCar } from "@/lib/ev/cars";
 import {
   estimateTrip,
   getArrivalStatusLabel,
@@ -26,10 +27,14 @@ import {
   type RoutePresetId,
 } from "@/lib/ev/presets";
 
-type ViewMode = "single" | "compare";
+type ViewMode = "single" | "compare" | "shop";
+type ShopBody = "any" | EvCar["bodyStyle"];
+type ShopPriority = "balanced" | "range" | "value" | "charging";
+type ShopMatch = { car: EvCar; score: number; realRange: number; reason: string };
 
 function RangeControl({
   label,
+  help,
   value,
   min,
   max,
@@ -38,6 +43,7 @@ function RangeControl({
   onChange,
 }: {
   label: string;
+  help: string;
   value: number;
   min: number;
   max: number;
@@ -45,16 +51,25 @@ function RangeControl({
   unit: string;
   onChange: (value: number) => void;
 }) {
+  const inputId = useId();
+
   return (
-    <label className="range-control">
+    <div className="range-control">
       <span>
-        <span>{label}</span>
+        <label className="range-label" htmlFor={inputId}>
+          {label}
+        </label>
+        <span className="info-wrap">
+          <button className="info-button" type="button" aria-label={`Why ${label.toLowerCase()} matters`}>?</button>
+          <span className="info-popover" role="tooltip">{help}</span>
+        </span>
         <strong>
           {value}
           {unit}
         </strong>
       </span>
       <input
+        id={inputId}
         type="range"
         min={min}
         max={max}
@@ -63,7 +78,41 @@ function RangeControl({
         aria-valuetext={`${value}${unit}`}
         onChange={(event) => onChange(Number(event.target.value))}
       />
-    </label>
+    </div>
+  );
+}
+
+function tankEquivalent(percent: number) {
+  if (percent <= 0) return "empty";
+  if (percent < 18) return "less than 1/4 tank";
+  if (percent < 38) return "about 1/4 tank";
+  if (percent < 63) return "about 1/2 tank";
+  if (percent < 88) return "about 3/4 tank";
+  return "nearly a full tank";
+}
+
+function CostComparison({ distance, energyKwh }: { distance: number; energyKwh: number }) {
+  const gasCost = (distance / 28) * 3.5;
+  const evCost = energyKwh * 0.16;
+
+  return (
+    <section className="cost-comparison" aria-labelledby="cost-title">
+      <div className="cost-heading">
+        <span>GAS VS. EV</span>
+        <h3 id="cost-title">Same trip. Different routine.</h3>
+      </div>
+      <div className="cost-grid">
+        <article className="cost-card gas-card">
+          <span className="cost-icon" aria-hidden="true">⛽</span>
+          <div><small>Gas vehicle</small><strong>~${Math.round(gasCost)}</strong><p>Estimated fuel cost, plus a gas station visit.</p></div>
+        </article>
+        <article className="cost-card ev-card">
+          <span className="cost-icon" aria-hidden="true">⚡</span>
+          <div><small>Electric vehicle</small><strong>~${Math.round(evCost)}</strong><p>Estimated home charging cost—and you can start each morning full.</p></div>
+        </article>
+      </div>
+      <p className="cost-assumptions">Illustrative comparison: 28 mpg at $3.50/gal vs. home charging at $0.16/kWh.</p>
+    </section>
   );
 }
 
@@ -80,18 +129,26 @@ function VehiclePicker({
   onChange: (id: string) => void;
   specs: EvCar;
 }) {
+  const makes = Array.from(new Set(cars.map((item) => item.make)));
+
   return (
     <div className="vehicle-picker">
       <label className="select-label" htmlFor={id}>
         {label}
         <select id={id} value={carId} onChange={(event) => onChange(event.target.value)}>
-          {cars.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
+          {makes.map((make) => (
+            <optgroup key={make} label={make}>
+              {cars.filter((item) => item.make === make).map((item) => (
+                <option key={item.id} value={item.id}>{item.name}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </label>
+      <div className="vehicle-card-heading" style={{ "--car-accent": specs.accent } as CSSProperties}>
+        <span className="picker-brand"><span className="brand-mark"><BrandLogo make={specs.make} /></span><CarSilhouette car={specs} /></span>
+        <span><small>{specs.make}</small><strong>{specs.shortName}</strong></span>
+      </div>
       <div className="car-specs">
         <span>
           <small>Usable battery</small>
@@ -106,22 +163,60 @@ function VehiclePicker({
   );
 }
 
+function CarSilhouette({ car }: { car: EvCar }) {
+  return (
+    <span className={`mini-car ${car.bodyStyle}`} aria-hidden="true">
+      <span className="mini-car-body" />
+      <span className="mini-wheel front" />
+      <span className="mini-wheel rear" />
+    </span>
+  );
+}
+
+function BrandLogo({ make }: { make: string }) {
+  const slug = make.toLowerCase();
+  return <img className="brand-logo" src={`/brands/${slug}.svg`} alt={`${make} logo`} loading="lazy" />;
+}
+
+function VehiclePhoto({ car, compact = false }: { car: EvCar; compact?: boolean }) {
+  const commonsSearch = `https://commons.wikimedia.org/wiki/Special:MediaSearch?type=image&search=${encodeURIComponent(car.name)}`;
+
+  return (
+    <figure className={`vehicle-photo${compact ? " compact" : ""}`}>
+      <Image
+        src={`/vehicles/${car.id}.jpg`}
+        alt={`${car.name} exterior`}
+        fill
+        sizes={compact ? "(max-width: 560px) 42vw, 240px" : "(max-width: 860px) 92vw, 520px"}
+      />
+      <figcaption>
+        <span className="photo-brand"><span className="photo-brand-mark"><BrandLogo make={car.make} /></span><strong>{car.make}</strong></span>
+        <a href={commonsSearch} target="_blank" rel="noreferrer" aria-label={`View ${car.name} photo source on Wikimedia Commons`}>Photo: Commons ↗</a>
+      </figcaption>
+    </figure>
+  );
+}
+
 function OutlookCard({
   car,
   estimate,
   distance,
+  startBattery,
   tip,
   charge,
   moreEfficient,
   compact,
+  reserveChargeSpace,
 }: {
   car: EvCar;
   estimate: TripEstimate;
   distance: number;
+  startBattery: number;
   tip: string;
   charge: ReturnType<typeof getChargeRecommendation>;
   moreEfficient: boolean;
   compact?: boolean;
+  reserveChargeSpace?: boolean;
 }) {
   const gauge = Math.min(100, Math.max(0, estimate.endBatteryPct));
   const status = estimate.arrivalStatus;
@@ -134,7 +229,7 @@ function OutlookCard({
     >
       <div className="result-top">
         <div className="outlook-identity">
-          <span className="outlook-car">{car.shortName}</span>
+          <span className="outlook-car-line"><CarSilhouette car={car} /><span className="outlook-car">{car.shortName}</span></span>
           {moreEfficient ? <span className="efficient-badge">More efficient</span> : null}
         </div>
         <span className={`status ${statusClass(status)}`} role="status">
@@ -142,13 +237,16 @@ function OutlookCard({
         </span>
       </div>
 
+      <VehiclePhoto car={car} compact={compact} />
+
       <div
         className="battery-visual"
         aria-label={`Estimated arrival battery ${Math.round(estimate.endBatteryPct)} percent`}
+        style={{ "--gauge-angle": `${gauge * 3.6}deg` } as CSSProperties}
       >
-        <div className={`battery-fill tone-${status}`} style={{ height: `${gauge}%` }} />
+        <div className={`energy-core tone-${status}`} aria-hidden="true" />
         <div className="battery-copy">
-          <small>ARRIVE WITH</small>
+          <small>ARRIVAL ENERGY</small>
           <strong>
             {Math.round(estimate.endBatteryPct)}
             <sup>%</sup>
@@ -157,36 +255,123 @@ function OutlookCard({
         </div>
       </div>
 
-      <div className="metrics">
+      <div className="tank-equivalent">
+        <div className="tank-label">
+          <small>Gas tank equivalent</small>
+          <strong>Arrives with {tankEquivalent(estimate.endBatteryPct)} remaining</strong>
+        </div>
+        <div className="tank-track" aria-hidden="true"><span style={{ width: `${gauge}%` }} /></div>
+      </div>
+
+      <div className="metrics beginner-metrics">
         <div>
           <small>Range left</small>
           <strong>~{Math.round(estimate.remainingRangeMi)} mi</strong>
         </div>
         <div>
-          <small>Energy use</small>
-          <strong>{estimate.whPerMi} Wh/mi</strong>
+          <small>Stops needed</small>
+          <strong>{status === "ready" ? "None" : "Plan one"}</strong>
         </div>
         <div>
-          <small>Trip energy</small>
-          <strong>{estimate.energyUsedKwh.toFixed(1)} kWh</strong>
+          <small>Starting charge</small>
+          <strong>{startBattery}%</strong>
         </div>
       </div>
 
-      {charge ? (
-        <div className="charge-tip" role="note">
-          <span>Fast Charge</span>
-          <p>
-            Add ~{charge.kwhNeeded.toFixed(1)} kWh (~{charge.minutes} min) to arrive near a{" "}
-            {charge.targetBufferPct}% buffer.
-          </p>
-        </div>
-      ) : null}
+      <div className={`charge-tip-slot${reserveChargeSpace ? " reserved" : ""}`}>
+        {charge ? (
+          <div className="charge-tip" role="note">
+            <span>Fast Charge</span>
+            <p>
+              Add ~{charge.kwhNeeded.toFixed(1)} kWh (~{charge.minutes} min) to arrive near a{" "}
+              {charge.targetBufferPct}% buffer.
+            </p>
+          </div>
+        ) : null}
+      </div>
 
       <div className={`tip-card tone-${status}`}>
         <span>GOOD TO KNOW</span>
         <p>{tip}</p>
       </div>
     </article>
+  );
+}
+
+function ShoppingProfile({
+  budget,
+  body,
+  seats,
+  homeCharging,
+  priority,
+  onBudget,
+  onBody,
+  onSeats,
+  onHomeCharging,
+  onPriority,
+}: {
+  budget: number;
+  body: ShopBody;
+  seats: number;
+  homeCharging: boolean;
+  priority: ShopPriority;
+  onBudget: (value: number) => void;
+  onBody: (value: ShopBody) => void;
+  onSeats: (value: number) => void;
+  onHomeCharging: (value: boolean) => void;
+  onPriority: (value: ShopPriority) => void;
+}) {
+  return (
+    <div className="shop-profile">
+      <RangeControl label="Maximum budget" help="We use an illustrative starting price before incentives, taxes, and options." value={budget / 1000} min={35} max={130} step={5} unit="k" onChange={(value) => onBudget(value * 1000)} />
+      <div className="shop-field-grid">
+        <label className="select-label">Body style
+          <select value={body} onChange={(event) => onBody(event.target.value as ShopBody)}>
+            <option value="any">Any body style</option><option value="sedan">Sedan</option><option value="crossover">Crossover</option><option value="suv">SUV</option><option value="truck">Truck</option>
+          </select>
+        </label>
+        <label className="select-label">Seats needed
+          <select value={seats} onChange={(event) => onSeats(Number(event.target.value))}>
+            <option value={4}>4 or more</option><option value={5}>5 or more</option><option value={7}>7 seats</option>
+          </select>
+        </label>
+        <label className="select-label">Top priority
+          <select value={priority} onChange={(event) => onPriority(event.target.value as ShopPriority)}>
+            <option value="balanced">Balanced match</option><option value="range">Longest range</option><option value="value">Best value</option><option value="charging">Fast charging</option>
+          </select>
+        </label>
+        <fieldset className="charge-at-home">
+          <legend>Home charging</legend>
+          <button type="button" className={homeCharging ? "active" : ""} aria-pressed={homeCharging} onClick={() => onHomeCharging(true)}>Available</button>
+          <button type="button" className={!homeCharging ? "active" : ""} aria-pressed={!homeCharging} onClick={() => onHomeCharging(false)}>Not available</button>
+        </fieldset>
+      </div>
+      <p className="shop-note">Adjust the trip conditions below and your matches will respond to your real driving life.</p>
+    </div>
+  );
+}
+
+function ShoppingResults({ matches, onCompare }: { matches: ShopMatch[]; onCompare: (first: EvCar, second: EvCar) => void }) {
+  return (
+    <div className="shop-results">
+      <div className="shop-results-heading"><span>YOUR BEST MATCHES</span><h2>Three EVs worth a closer look.</h2><p>Ranked for your needs and the conditions selected on this page.</p></div>
+      <div className="shop-match-list">
+        {matches.map((match, index) => {
+          const spec = getShopSpec(match.car);
+          return (
+            <article className="shop-match" key={match.car.id} style={{ "--car-accent": match.car.accent } as CSSProperties}>
+              <div className="shop-rank">0{index + 1}</div>
+              <VehiclePhoto car={match.car} compact />
+              <div className="shop-match-title"><CarSilhouette car={match.car} /><div><small>{match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
+              <div className="shop-match-metrics"><span><small>From</small><strong>~${Math.round(spec.startingPriceUsd / 1000)}k</strong></span><span><small>Real-life range</small><strong>~{match.realRange} mi</strong></span><span><small>Seats</small><strong>{spec.seats}</strong></span><span><small>DC peak</small><strong>{spec.dcFastChargeKw} kW</strong></span></div>
+              <p>{match.reason}</p>
+            </article>
+          );
+        })}
+      </div>
+      {matches.length >= 2 ? <button className="compare-matches" type="button" onClick={() => onCompare(matches[0].car, matches[1].car)}>Compare the top two</button> : null}
+      <p className="shopping-disclaimer">Shopping data is illustrative and can change by trim, options, incentives, and model year. Confirm pricing and specifications with the manufacturer before purchasing.</p>
+    </div>
   );
 }
 
@@ -208,7 +393,11 @@ export default function Home() {
   const [climate, setClimate] = useState<Climate>("normal");
   const [load, setLoad] = useState(250);
   const [elevationGainFt, setElevationGainFt] = useState(0);
-  const [expert, setExpert] = useState(false);
+  const [shopBudget, setShopBudget] = useState(60000);
+  const [shopBody, setShopBody] = useState<ShopBody>("any");
+  const [shopSeats, setShopSeats] = useState(5);
+  const [homeCharging, setHomeCharging] = useState(true);
+  const [shopPriority, setShopPriority] = useState<ShopPriority>("balanced");
 
   const car = cars.find((item) => item.id === carId) ?? DEFAULT_CAR;
   const carB = cars.find((item) => item.id === carIdB) ?? cars[1] ?? DEFAULT_CAR;
@@ -241,6 +430,32 @@ export default function Home() {
       ? getMoreEfficientCarId({ carId: car.id, whPerMi: result.whPerMi }, { carId: carB.id, whPerMi: resultB.whPerMi })
       : null;
 
+  const shopMatches = useMemo<ShopMatch[]>(() => cars.map((candidate) => {
+    const spec = getShopSpec(candidate);
+    const estimate = estimateTrip(candidate, inputs);
+    const realRange = Math.max(0, Math.round((candidate.usableBatteryKwh * 1000) / estimate.whPerMi));
+    const budgetFit = spec.startingPriceUsd <= shopBudget ? 30 : Math.max(0, 30 - ((spec.startingPriceUsd - shopBudget) / 2000));
+    const bodyFit = shopBody === "any" || candidate.bodyStyle === shopBody ? 18 : 0;
+    const seatFit = spec.seats >= shopSeats ? 14 : 0;
+    const rangeWeight = shopPriority === "range" ? 30 : 20;
+    const valueWeight = shopPriority === "value" ? 18 : 8;
+    const chargeWeight = shopPriority === "charging" || !homeCharging ? 18 : 10;
+    const rangeFit = Math.min(rangeWeight, (realRange / 450) * rangeWeight);
+    const valueFit = Math.min(valueWeight, (realRange / Math.max(1, spec.startingPriceUsd / 1000)) * (valueWeight / 7));
+    const chargeFit = Math.min(chargeWeight, (spec.dcFastChargeKw / 300) * chargeWeight);
+    const total = budgetFit + bodyFit + seatFit + rangeFit + valueFit + chargeFit;
+    const max = 30 + 18 + 14 + rangeWeight + valueWeight + chargeWeight;
+    const score = Math.max(1, Math.min(99, Math.round((total / max) * 100)));
+    const reason = spec.startingPriceUsd > shopBudget
+      ? `Strong capability, but its illustrative starting price is about $${Math.round((spec.startingPriceUsd - shopBudget) / 1000)}k over your budget.`
+      : shopPriority === "range"
+        ? `A standout for distance, with about ${realRange} miles under the conditions you selected.`
+        : !homeCharging && spec.dcFastChargeKw >= 220
+          ? `Its strong DC charging rate makes life without a home charger easier.`
+          : `${candidate.bodyStyle === shopBody || shopBody === "any" ? "Fits your preferred shape" : "A smart alternative shape"} with a useful balance of range, price, and charging.`;
+    return { car: candidate, score, realRange, reason };
+  }).sort((a, b) => b.score - a.score).slice(0, 3), [inputs, shopBudget, shopBody, shopSeats, homeCharging, shopPriority]);
+
   function patchInputs(next: TripInputs) {
     setDistance(next.distanceMi);
     setBattery(next.startBatteryPct);
@@ -264,8 +479,12 @@ export default function Home() {
     <main>
       <header className="site-header">
         <a className="brand" href="#top" aria-label="EV Range Lab home">
-          <span className="brand-mark">EV</span>
-          <span>Range Lab</span>
+          <span className="brand-mark" aria-hidden="true">
+            <span className="brand-car" />
+            <span className="brand-wheel rear" />
+            <span className="brand-wheel front" />
+          </span>
+          <span className="brand-name">EV Range Lab</span>
         </a>
         <div className="header-controls">
           <div className="mode-toggle" role="group" aria-label="Vehicle view">
@@ -285,32 +504,25 @@ export default function Home() {
             >
               Compare
             </button>
-          </div>
-          <div className="mode-toggle subtle" role="group" aria-label="Detail level">
-            <button type="button" className={!expert ? "active" : ""} aria-pressed={!expert} onClick={() => setExpert(false)}>
-              Learn
-            </button>
-            <button type="button" className={expert ? "active" : ""} aria-pressed={expert} onClick={() => setExpert(true)}>
-              Expert
-            </button>
+            <button type="button" className={viewMode === "shop" ? "active" : ""} aria-pressed={viewMode === "shop"} onClick={() => setViewMode("shop")}>Shop</button>
           </div>
         </div>
       </header>
 
-      <section className="hero" id="top">
-        <div>
-          <p className="eyebrow">Range without the guesswork</p>
-          <h1>
-            See how far your EV can <em>really</em> go.
-          </h1>
-          <p className="lede">
-            Pick a car, shape the drive, and watch conditions change the outcome. Compare models, catch low-buffer trips early, and
-            stress-test climbs before you leave.
-          </p>
-        </div>
-        <div className="hero-note">
+      <section className="hero hero-visual" id="top" aria-label="EV Range Lab introduction">
+        <Image
+          className="hero-image"
+          src="/hero-silhouette.png"
+          alt="EV Range Lab — See how far your EV can really go, with a generic pixel-art electric car silhouette and battery gauge"
+          width={1728}
+          height={909}
+          priority
+          unoptimized
+          sizes="(max-width: 1440px) 100vw, 1440px"
+        />
+        <div className="hero-note hero-note-overlay">
           <span>LIVE MODEL</span>
-          <p>One shared set of conditions. Every estimate updates together.</p>
+          <p>Compare cars, terrain, speed, and weather below.</p>
         </div>
       </section>
 
@@ -319,12 +531,14 @@ export default function Home() {
           <div className="section-heading">
             <span>01</span>
             <div>
-              <p>Choose your EV</p>
-              <h2>{viewMode === "compare" ? "Compare models" : car.shortName}</h2>
+              <p>{viewMode === "shop" ? "Find your EV" : "Choose your EV"}</p>
+              <h2>{viewMode === "compare" ? "Compare models" : viewMode === "shop" ? "What fits your life?" : car.shortName}</h2>
             </div>
           </div>
 
-          {viewMode === "single" ? (
+          {viewMode === "shop" ? (
+            <ShoppingProfile budget={shopBudget} body={shopBody} seats={shopSeats} homeCharging={homeCharging} priority={shopPriority} onBudget={setShopBudget} onBody={setShopBody} onSeats={setShopSeats} onHomeCharging={setHomeCharging} onPriority={setShopPriority} />
+          ) : viewMode === "single" ? (
             <VehiclePicker id="vehicle-a" label="Vehicle" carId={carId} onChange={setCarId} specs={car} />
           ) : (
             <div className="compare-pickers">
@@ -340,6 +554,12 @@ export default function Home() {
               />
             </div>
           )}
+
+          {viewMode === "shop" ? (
+            <div className="mobile-shopping-results">
+              <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
+            </div>
+          ) : null}
 
           <div className="section-heading compact">
             <span>02</span>
@@ -367,10 +587,11 @@ export default function Home() {
             </div>
           </div>
 
-          <RangeControl label="Trip distance" value={distance} min={5} max={400} step={5} unit=" mi" onChange={setDistance} />
-          <RangeControl label="Starting battery" value={battery} min={10} max={100} step={5} unit="%" onChange={setBattery} />
+          <RangeControl label="Trip distance" help="How far you plan to drive before reaching your destination or next charger." value={distance} min={5} max={400} step={5} unit=" mi" onChange={setDistance} />
+          <RangeControl label="Starting battery" help="Think of this like the fuel gauge when you leave. Most EV owners charge at home overnight." value={battery} min={10} max={100} step={5} unit="%" onChange={setBattery} />
           <RangeControl
             label="Outside temperature"
+            help="Cold slows the battery's chemistry and cabin heat uses extra energy. Preheating while plugged in helps."
             value={temperature}
             min={-10}
             max={110}
@@ -378,7 +599,7 @@ export default function Home() {
             unit="°F"
             onChange={setTemperature}
           />
-          <RangeControl label="Average speed" value={speed} min={20} max={85} unit=" mph" onChange={setSpeed} />
+          <RangeControl label="Average speed" help="Driving faster pushes much more air out of the way. Highway speed usually reduces range the most." value={speed} min={20} max={85} unit=" mph" onChange={setSpeed} />
 
           <div className="field-grid">
             <label className="select-label" htmlFor="terrain">
@@ -421,6 +642,7 @@ export default function Home() {
 
           <RangeControl
             label="Net elevation"
+            help="Long climbs use extra energy. You regain some on the way down through regenerative braking, but not all of it."
             value={elevationGainFt}
             min={-3000}
             max={5000}
@@ -428,77 +650,69 @@ export default function Home() {
             unit=" ft"
             onChange={setElevationGainFt}
           />
-          <RangeControl label="Passengers + cargo" value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
+          <RangeControl label="Passengers + cargo" help="More people and luggage add weight. The effect is usually smaller than speed or temperature." value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
         </div>
 
-        <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}`}>
+        <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}${viewMode === "shop" ? " shopping" : ""}`}>
+          {viewMode === "shop" ? (
+            <div className="desktop-shopping-results">
+              <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
+            </div>
+          ) : (
+          <>
           <div className={`outlook-stack${viewMode === "compare" ? " dual" : ""}`}>
             <OutlookCard
               car={car}
               estimate={result}
               distance={distance}
+              startBattery={battery}
               tip={tip}
               charge={charge}
               moreEfficient={winnerId === car.id}
               compact={viewMode === "compare"}
+              reserveChargeSpace={viewMode === "compare" && Boolean(charge || chargeB)}
             />
             {viewMode === "compare" ? (
               <OutlookCard
                 car={carB}
                 estimate={resultB}
                 distance={distance}
+                startBattery={battery}
                 tip={tipB}
                 charge={chargeB}
                 moreEfficient={winnerId === carB.id}
                 compact
+                reserveChargeSpace={Boolean(charge || chargeB)}
               />
             ) : null}
           </div>
 
-          {expert ? (
-            <div className="expert-panel">
-              <div className="expert-title">
-                <span>Model factors{viewMode === "compare" ? ` · ${car.shortName}` : ""}</span>
-                <small>vs. mild 65 mph baseline</small>
-              </div>
-              {result.factors.map((factor) => (
-                <div className="factor" key={factor.label}>
-                  <span>{factor.label}</span>
-                  <div>
-                    <i style={{ width: `${Math.min(100, Math.max(8, ((factor.multiplier - 0.8) / 0.5) * 100))}%` }} />
-                  </div>
-                  <strong>{factor.multiplier.toFixed(2)}×</strong>
-                </div>
-              ))}
-              {result.elevationWhPerMi !== 0 ? (
-                <p className="method-note">
-                  Elevation adds {result.elevationWhPerMi > 0 ? "+" : ""}
-                  {result.elevationWhPerMi} Wh/mi before rounding
-                  {viewMode === "compare" ? ` · ${carB.shortName}: ${resultB.elevationWhPerMi > 0 ? "+" : ""}${resultB.elevationWhPerMi} Wh/mi` : ""}.
-                </p>
-              ) : (
-                <p className="method-note">Factors are broad, rounded estimates—not a physics-grade route simulation.</p>
-              )}
-            </div>
-          ) : null}
+          <CostComparison distance={distance} energyKwh={result.energyUsedKwh} />
+          </>
+          )}
         </aside>
       </section>
 
       <section className="how-it-works">
-        <p className="eyebrow">What changes range?</p>
-        <h2>Three forces do most of the work.</h2>
-        <div className="explain-grid">
-          <article>
+        <div className="explain-heading">
+          <div>
+            <p className="eyebrow">What changes range?</p>
+            <h2>Three forces do most of the work.</h2>
+          </div>
+          <p className="scroll-cue" aria-hidden="true"><span>Scroll to explore</span><i>→</i></p>
+        </div>
+        <div className="explain-grid" role="list" aria-label="The three biggest forces affecting EV range">
+          <article role="listitem">
             <span>01</span>
             <h3>Air gets expensive</h3>
             <p>At highway speed, pushing air aside takes much more energy. Slowing down is often your most powerful lever.</p>
           </article>
-          <article>
+          <article role="listitem">
             <span>02</span>
             <h3>Temperature matters</h3>
             <p>Cold batteries deliver less energy, while cabin heat adds demand. Preconditioning while plugged in helps.</p>
           </article>
-          <article>
+          <article role="listitem">
             <span>03</span>
             <h3>Elevation collects a toll</h3>
             <p>Climbing costs energy. Regeneration gives some back downhill, but never all of it—Mountain Pass makes that vivid.</p>

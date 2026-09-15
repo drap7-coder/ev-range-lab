@@ -1,6 +1,6 @@
 import type { Climate, Hills, TripInputs } from "./model";
 
-export type RoutePresetId = "city-errands" | "daily-commute" | "road-trip";
+export type RoutePresetId = "winter-commute" | "summer-road-trip" | "city-errands";
 export type GeoPresetId = "flat-highway" | "mountain-pass" | "coastal-drive";
 
 export type RoutePreset = {
@@ -21,9 +21,39 @@ export type GeoPreset = {
 /** Multi-variable condition shortcuts — one tap sets a coherent drive story. */
 export const routePresets: RoutePreset[] = [
   {
+    id: "winter-commute",
+    label: "❄️ Freezing Winter Commute",
+    hint: "Cold battery, full heat, freeway speeds",
+    patch: {
+      distanceMi: 52,
+      startBatteryPct: 80,
+      averageSpeedMph: 68,
+      temperatureF: 15,
+      hills: "rolling",
+      climate: "max",
+      loadLb: 200,
+      elevationGainFt: 200,
+    },
+  },
+  {
+    id: "summer-road-trip",
+    label: "🏖️ Summer Family Road Trip",
+    hint: "A/C, luggage, and 75 mph highway driving",
+    patch: {
+      distanceMi: 220,
+      startBatteryPct: 100,
+      averageSpeedMph: 75,
+      temperatureF: 92,
+      hills: "rolling",
+      climate: "normal",
+      loadLb: 700,
+      elevationGainFt: 400,
+    },
+  },
+  {
     id: "city-errands",
-    label: "City errands",
-    hint: "Short hops, stop-and-go",
+    label: "🏙️ City Errands",
+    hint: "Stop-and-go driving helps regeneration",
     patch: {
       distanceMi: 24,
       averageSpeedMph: 32,
@@ -32,34 +62,6 @@ export const routePresets: RoutePreset[] = [
       climate: "normal",
       loadLb: 150,
       elevationGainFt: 0,
-    },
-  },
-  {
-    id: "daily-commute",
-    label: "Daily commute",
-    hint: "Mixed arterial + freeway",
-    patch: {
-      distanceMi: 52,
-      averageSpeedMph: 52,
-      temperatureF: 55,
-      hills: "rolling",
-      climate: "normal",
-      loadLb: 200,
-      elevationGainFt: 200,
-    },
-  },
-  {
-    id: "road-trip",
-    label: "Road trip",
-    hint: "Highway stretch",
-    patch: {
-      distanceMi: 180,
-      averageSpeedMph: 70,
-      temperatureF: 45,
-      hills: "rolling",
-      climate: "normal",
-      loadLb: 350,
-      elevationGainFt: 400,
     },
   },
 ];

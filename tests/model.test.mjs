@@ -106,15 +106,15 @@ test("Mountain Pass estimate uses more Wh/mi than Flat Highway under identical o
   assert.ok(mountain.elevationWhPerMi > 0);
 });
 
-test("route presets apply multi-variable patches; Road trip matches the shipping brief", () => {
-  const road = routePresets.find((preset) => preset.id === "road-trip");
+test("beginner scenarios apply coherent multi-variable conditions", () => {
+  const road = routePresets.find((preset) => preset.id === "summer-road-trip");
   assert.ok(road);
-  const next = applyRoutePreset(baseInputs, "road-trip");
-  assert.equal(next.distanceMi, 180);
-  assert.equal(next.averageSpeedMph, 70);
-  assert.equal(next.temperatureF, 45);
+  const next = applyRoutePreset(baseInputs, "summer-road-trip");
+  assert.equal(next.distanceMi, 220);
+  assert.equal(next.averageSpeedMph, 75);
+  assert.equal(next.temperatureF, 92);
   assert.equal(next.hills, "rolling");
-  assert.equal(matchRoutePreset(next), "road-trip");
+  assert.equal(matchRoutePreset(next), "summer-road-trip");
 
   const city = applyRoutePreset(baseInputs, "city-errands");
   assert.equal(city.distanceMi, 24);
@@ -152,7 +152,7 @@ test("comparison math badges the lower Wh/mi car and ties cleanly", () => {
 });
 
 test("shared compare inputs never diverge between vehicles", () => {
-  const shared = applyRoutePreset(baseInputs, "road-trip");
+  const shared = applyRoutePreset(baseInputs, "summer-road-trip");
   const left = estimateTrip(cars[0], shared);
   const right = estimateTrip(cars[3], shared);
   assert.notEqual(left.whPerMi, right.whPerMi);
