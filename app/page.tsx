@@ -476,7 +476,7 @@ export default function Home() {
   }
 
   return (
-    <main>
+    <main id="top">
       <header className="site-header">
         <a className="brand" href="#top" aria-label="EV Range Lab home">
           <span className="brand-mark" aria-hidden="true">
@@ -508,23 +508,6 @@ export default function Home() {
           </div>
         </div>
       </header>
-
-      <section className="hero hero-visual" id="top" aria-label="EV Range Lab introduction">
-        <Image
-          className="hero-image"
-          src="/hero-silhouette.png"
-          alt="EV Range Lab — See how far your EV can really go, with a generic pixel-art electric car silhouette and battery gauge"
-          width={1728}
-          height={909}
-          priority
-          unoptimized
-          sizes="(max-width: 1440px) 100vw, 1440px"
-        />
-        <div className="hero-note hero-note-overlay">
-          <span>LIVE MODEL</span>
-          <p>Compare cars, terrain, speed, and weather below.</p>
-        </div>
-      </section>
 
       <section className="lab-shell" aria-label="EV range calculator" data-mode={viewMode}>
         <div className="controls-panel">
