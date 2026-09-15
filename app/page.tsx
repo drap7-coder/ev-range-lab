@@ -173,6 +173,25 @@ function CarSilhouette({ car }: { car: EvCar }) {
   );
 }
 
+function VehiclePhoto({ car, compact = false }: { car: EvCar; compact?: boolean }) {
+  const commonsSearch = `https://commons.wikimedia.org/wiki/Special:MediaSearch?type=image&search=${encodeURIComponent(car.name)}`;
+
+  return (
+    <figure className={`vehicle-photo${compact ? " compact" : ""}`}>
+      <Image
+        src={`/vehicles/${car.id}.jpg`}
+        alt={`${car.name} exterior`}
+        fill
+        sizes={compact ? "(max-width: 560px) 42vw, 240px" : "(max-width: 860px) 92vw, 520px"}
+      />
+      <figcaption>
+        <span className="make-badge">{car.make}</span>
+        <a href={commonsSearch} target="_blank" rel="noreferrer" aria-label={`View ${car.name} photo source on Wikimedia Commons`}>Photo: Commons ↗</a>
+      </figcaption>
+    </figure>
+  );
+}
+
 function OutlookCard({
   car,
   estimate,
@@ -212,6 +231,8 @@ function OutlookCard({
           {getArrivalStatusLabel(status)}
         </span>
       </div>
+
+      <VehiclePhoto car={car} compact={compact} />
 
       <div
         className="battery-visual"
@@ -335,6 +356,7 @@ function ShoppingResults({ matches, onCompare }: { matches: ShopMatch[]; onCompa
           return (
             <article className="shop-match" key={match.car.id} style={{ "--car-accent": match.car.accent } as CSSProperties}>
               <div className="shop-rank">0{index + 1}</div>
+              <VehiclePhoto car={match.car} compact />
               <div className="shop-match-title"><CarSilhouette car={match.car} /><div><small>{match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
               <div className="shop-match-metrics"><span><small>From</small><strong>~${Math.round(spec.startingPriceUsd / 1000)}k</strong></span><span><small>Real-life range</small><strong>~{match.realRange} mi</strong></span><span><small>Seats</small><strong>{spec.seats}</strong></span><span><small>DC peak</small><strong>{spec.dcFastChargeKw} kW</strong></span></div>
               <p>{match.reason}</p>

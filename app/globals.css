@@ -564,6 +564,70 @@ input[type="range"]::-webkit-slider-thumb {
   text-transform: uppercase;
   font-weight: 700;
 }
+.vehicle-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 8.2;
+  min-height: 170px;
+  margin: 18px 0 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb,var(--car-accent) 28%,rgba(255,255,255,.1));
+  border-radius: 14px;
+  background: #101820;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 14px 30px rgba(0,0,0,.3), 0 0 28px color-mix(in srgb,var(--car-accent) 7%,transparent);
+}
+.vehicle-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 50%, rgba(2,6,9,.82) 100%), linear-gradient(135deg, rgba(255,255,255,.08), transparent 32%);
+}
+.vehicle-photo img {
+  object-fit: cover;
+  object-position: center 58%;
+  filter: saturate(.88) contrast(1.06) brightness(.88);
+  transform: scale(1.015);
+  transition: transform .5s ease, filter .35s ease;
+}
+.vehicle-photo figcaption {
+  position: absolute;
+  z-index: 2;
+  right: 12px;
+  bottom: 10px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.make-badge {
+  padding: 6px 9px;
+  color: #07100e;
+  border-radius: 6px;
+  background: var(--car-accent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 5px 14px rgba(0,0,0,.35);
+  font: 850 9px/1 var(--font-mono);
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+.vehicle-photo figcaption a {
+  color: rgba(255,255,255,.72);
+  font: 650 8px/1 var(--font-mono);
+  letter-spacing: .04em;
+  text-decoration: none;
+}
+.vehicle-photo figcaption a:hover,
+.vehicle-photo figcaption a:focus-visible { color: white; text-decoration: underline; }
+.vehicle-photo.compact { min-height: 112px; border-radius: 11px; }
+.outlook-card.compact .vehicle-photo { aspect-ratio: 16 / 9; min-height: 105px; margin-top: 14px; }
+.shop-match .vehicle-photo { aspect-ratio: 16 / 6.2; min-height: 112px; margin: 0 0 16px; }
+.shop-match .vehicle-photo figcaption { right: 9px; bottom: 8px; left: 9px; }
+.shop-match .vehicle-photo + .shop-match-title { padding-top: 2px; }
+@media (hover:hover) and (pointer:fine) {
+  .outlook-card:hover .vehicle-photo img,
+  .shop-match:hover .vehicle-photo img { transform: scale(1.055); filter: saturate(1) contrast(1.08) brightness(.94); }
+}
 .efficient-badge {
   display: inline-flex;
   align-items: center;
@@ -1303,6 +1367,10 @@ footer p {
   .outlook-stack.dual .outlook-car { font-size: 9px; letter-spacing: .04em; }
   .outlook-stack.dual .efficient-badge { padding: 3px 5px; font-size: 7px; }
   .outlook-stack.dual .status { width: 100%; max-width: none; padding: 8px; font-size: 10px; text-align: left; }
+  .outlook-stack.dual .vehicle-photo { min-height: 78px; margin-top: 8px; border-radius: 8px; }
+  .outlook-stack.dual .vehicle-photo figcaption { right: 6px; bottom: 6px; left: 6px; }
+  .outlook-stack.dual .vehicle-photo figcaption a { display: none; }
+  .outlook-stack.dual .make-badge { padding: 4px 6px; font-size: 7px; }
   .outlook-card.compact .battery-visual { width: min(100%, 142px); margin-top: 14px; }
   .outlook-card.compact .battery-copy small { font-size: 7px; }
   .outlook-card.compact .battery-copy strong { font-size: 42px; }
