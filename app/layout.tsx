@@ -15,6 +15,9 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(`${protocol}://${host}`),
     title: "EV Range Lab — Explore real-world electric range",
     description: "An interactive lab for learning how cars, trips, weather, speed, terrain, climate, and load affect EV range.",
+    icons: {
+      icon: [{ url: "/favicon-clear-v1.png", sizes: "32x32", type: "image/png" }],
+    },
     openGraph: {
       title: "EV Range Lab",
       description: "See how far your EV can really go.",
