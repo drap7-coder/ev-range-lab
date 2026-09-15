@@ -146,7 +146,7 @@ function VehiclePicker({
         </select>
       </label>
       <div className="vehicle-card-heading" style={{ "--car-accent": specs.accent } as CSSProperties}>
-        <span className="picker-brand"><BrandLogo make={specs.make} /><CarSilhouette car={specs} /></span>
+        <span className="picker-brand"><span className="brand-mark"><BrandLogo make={specs.make} /></span><CarSilhouette car={specs} /></span>
         <span><small>{specs.make}</small><strong>{specs.shortName}</strong></span>
       </div>
       <div className="car-specs">
@@ -190,7 +190,7 @@ function VehiclePhoto({ car, compact = false }: { car: EvCar; compact?: boolean 
         sizes={compact ? "(max-width: 560px) 42vw, 240px" : "(max-width: 860px) 92vw, 520px"}
       />
       <figcaption>
-        <span className="photo-brand"><BrandLogo make={car.make} /></span>
+        <span className="photo-brand"><span className="photo-brand-mark"><BrandLogo make={car.make} /></span><strong>{car.make}</strong></span>
         <a href={commonsSearch} target="_blank" rel="noreferrer" aria-label={`View ${car.name} photo source on Wikimedia Commons`}>Photo: Commons ↗</a>
       </figcaption>
     </figure>
