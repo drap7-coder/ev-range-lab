@@ -15,15 +15,6 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(`${protocol}://${host}`),
     title: "EV Range Lab — Explore real-world electric range",
     description: "An interactive lab for learning how cars, trips, weather, speed, terrain, climate, and load affect EV range.",
-    manifest: "/manifest.webmanifest",
-    icons: {
-      icon: [
-        { url: "/icons/ev-range-lab-favicon-v3.ico", sizes: "32x32", type: "image/x-icon" },
-        { url: "/icons/ev-range-lab-favicon-16-v3.png", sizes: "16x16", type: "image/png" },
-        { url: "/icons/ev-range-lab-favicon-32-v3.png", sizes: "32x32", type: "image/png" },
-      ],
-      apple: [{ url: "/icons/ev-range-lab-apple-touch-v3.png", sizes: "180x180", type: "image/png" }],
-    },
     openGraph: {
       title: "EV Range Lab",
       description: "See how far your EV can really go.",
