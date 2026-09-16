@@ -480,7 +480,7 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#top" aria-label="EV Range Lab home">
           <span className="brand-mark" aria-hidden="true">
-            <Image src="/icons/pwa-192-v4.png" alt="" width={42} height={42} priority />
+            <img src="/icons/pwa-192-v4.png" alt="" width={42} height={42} />
           </span>
           <span className="brand-name">EV Range Lab</span>
         </a>
