@@ -48,12 +48,7 @@ main { min-height: 100vh; }
 }
 .brand-name {
   display: inline-block;
-  width: 12ch;
-  overflow: hidden;
   white-space: nowrap;
-  border-right: 1px solid #71e5da;
-  clip-path: inset(0 100% 0 0);
-  animation: brand-type 1.15s steps(12, end) 0.15s forwards, cursor-blink 0.72s step-end 4;
 }
 .brand-mark {
   position: relative;
@@ -317,7 +312,7 @@ select {
   align-items: center;
   gap: 5px;
 }
-.brand-mark {
+.brand-logo-badge {
   display: grid;
   width: 58px;
   height: 32px;
@@ -1274,13 +1269,6 @@ footer p {
   0%, 100% { transform: scale(0.98); opacity: 0.82; }
   50% { transform: scale(1.03); opacity: 1; }
 }
-@keyframes brand-type {
-  to { clip-path: inset(0 0 0 0); }
-}
-@keyframes cursor-blink {
-  50% { border-right-color: transparent; }
-}
-
 @media (max-width: 1100px) {
   .outlook-stack.dual .result-top { min-height: 82px; }
   .outlook-stack.dual .charge-tip-slot.reserved { min-height: 0; }
@@ -1301,8 +1289,8 @@ footer p {
   html, body { overflow-x: clip; }
   .site-header { min-height: 0; padding: 14px 20px 16px; flex-direction: column; align-items: stretch; gap: 12px; }
   .brand { align-self: flex-start; }
-  .header-controls { width: 100%; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 8px; }
-  .mode-toggle { flex: 1; }
+  .header-controls { width: 100%; display: flex; }
+  .mode-toggle { width: 100%; }
   .mode-toggle button { flex: 1; min-width: 0; padding: 9px 6px; font-size: 9px; }
   .lede { font-size: 16px; }
   .controls-panel,
@@ -1376,7 +1364,6 @@ footer p {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand-name { clip-path: none; border-right: 0; }
   *,
   *::before,
   *::after {

@@ -146,7 +146,7 @@ function VehiclePicker({
         </select>
       </label>
       <div className="vehicle-card-heading" style={{ "--car-accent": specs.accent } as CSSProperties}>
-        <span className="picker-brand"><span className="brand-mark"><BrandLogo make={specs.make} /></span><CarSilhouette car={specs} /></span>
+        <span className="picker-brand"><span className="brand-logo-badge"><BrandLogo make={specs.make} /></span><CarSilhouette car={specs} /></span>
         <span><small>{specs.make}</small><strong>{specs.shortName}</strong></span>
       </div>
       <div className="car-specs">
