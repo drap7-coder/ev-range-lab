@@ -15,13 +15,14 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(`${protocol}://${host}`),
     title: "EV Range Lab — Know your real-world range",
     description: "Choose an EV, shape the drive, and see your estimated arrival charge instantly.",
-    manifest: "/manifest.webmanifest?v=5",
+    manifest: "/manifest.webmanifest?v=6",
     icons: {
       icon: [
-        { url: "/icons/favicon-16-v5.png", sizes: "16x16", type: "image/png" },
-        { url: "/icons/favicon-32-v5.png", sizes: "32x32", type: "image/png" },
+        { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+        { url: "/icons/favicon-16-v6.png", sizes: "16x16", type: "image/png" },
+        { url: "/icons/favicon-32-v6.png", sizes: "32x32", type: "image/png" },
       ],
-      apple: [{ url: "/icons/apple-touch-icon-v5.png", sizes: "180x180", type: "image/png" }],
+      apple: [{ url: "/icons/apple-touch-icon-v6.png", sizes: "180x180", type: "image/png" }],
     },
     openGraph: {
       title: "EV Range Lab",

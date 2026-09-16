@@ -66,28 +66,28 @@ export const routePresets: RoutePreset[] = [
   },
 ];
 
-/** Recognizable elevation stories near the terrain control. */
+/** One landscape control sets both terrain and net elevation together. */
 export const geoPresets: GeoPreset[] = [
   {
     id: "flat-highway",
-    label: "Flat Highway Run",
-    hint: "0 ft net",
+    label: "Flat roads",
+    hint: "Level highway · 0 ft",
     elevationGainFt: 0,
     hills: "flat",
   },
   {
-    id: "mountain-pass",
-    label: "Mountain Pass",
-    hint: "+3,000 ft net",
-    elevationGainFt: 3000,
-    hills: "steep",
-  },
-  {
     id: "coastal-drive",
-    label: "Coastal Drive",
-    hint: "+400 ft, gentle",
+    label: "Rolling hills",
+    hint: "Gentle country · +400 ft",
     elevationGainFt: 400,
     hills: "rolling",
+  },
+  {
+    id: "mountain-pass",
+    label: "Mountain pass",
+    hint: "Sustained climb · +3,000 ft",
+    elevationGainFt: 3000,
+    hills: "steep",
   },
 ];
 

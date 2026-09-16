@@ -266,23 +266,19 @@ function ShoppingProfile({
   budget,
   body,
   seats,
-  homeCharging,
   priority,
   onBudget,
   onBody,
   onSeats,
-  onHomeCharging,
   onPriority,
 }: {
   budget: number;
   body: ShopBody;
   seats: number;
-  homeCharging: boolean;
   priority: ShopPriority;
   onBudget: (value: number) => void;
   onBody: (value: ShopBody) => void;
   onSeats: (value: number) => void;
-  onHomeCharging: (value: boolean) => void;
   onPriority: (value: ShopPriority) => void;
 }) {
   return (
@@ -304,14 +300,41 @@ function ShoppingProfile({
             <option value="balanced">Balanced match</option><option value="range">Longest range</option><option value="value">Best value</option><option value="charging">Fast charging</option>
           </select>
         </label>
-        <fieldset className="charge-at-home">
-          <legend>Home charging</legend>
-          <button type="button" className={homeCharging ? "active" : ""} aria-pressed={homeCharging} onClick={() => onHomeCharging(true)}>Available</button>
-          <button type="button" className={!homeCharging ? "active" : ""} aria-pressed={!homeCharging} onClick={() => onHomeCharging(false)}>Not available</button>
-        </fieldset>
       </div>
-      <p className="shop-note">Adjust the trip conditions below and your matches will respond to your real driving life.</p>
+      <p className="shop-note">We assume overnight home charging. Adjust the trip below and matches will follow your real driving life.</p>
     </div>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="hero" aria-label="Introduction">
+      <div className="hero-copy">
+        <p className="eyebrow">Range before the driveway</p>
+        <h1>See the charge you’ll <em>actually</em> arrive with.</h1>
+        <p className="lede">
+          Pick an EV, shape the drive, and watch speed, weather, and landscape rewrite the window-sticker number.
+        </p>
+        <ul className="hero-stats">
+          <li><strong>{cars.length}</strong><span>EVs in the lab</span></li>
+          <li><strong>3</strong><span>landscapes</span></li>
+          <li><strong>Live</strong><span>arrival SoC</span></li>
+        </ul>
+      </div>
+      <div className="hero-stage" aria-hidden="true">
+        <figure className="hero-photo back">
+          <Image src="/vehicles/ioniq-5.jpg" alt="" fill sizes="(max-width: 860px) 90vw, 420px" unoptimized />
+        </figure>
+        <figure className="hero-photo main">
+          <Image src="/vehicles/model-3-lr.jpg" alt="" fill sizes="(max-width: 860px) 92vw, 480px" unoptimized />
+        </figure>
+        <div className="hero-float soc">
+          <small>Arrival energy</small>
+          <strong>82%</strong>
+        </div>
+        <div className="hero-float chip">Cold + highway</div>
+      </div>
+    </section>
   );
 }
 
@@ -353,14 +376,13 @@ export default function Home() {
   const [battery, setBattery] = useState(90);
   const [temperature, setTemperature] = useState(55);
   const [speed, setSpeed] = useState(62);
-  const [hills, setHills] = useState<Hills>("rolling");
+  const [hills, setHills] = useState<Hills>("flat");
   const [climate, setClimate] = useState<Climate>("normal");
   const [load, setLoad] = useState(250);
   const [elevationGainFt, setElevationGainFt] = useState(0);
   const [shopBudget, setShopBudget] = useState(60000);
   const [shopBody, setShopBody] = useState<ShopBody>("any");
   const [shopSeats, setShopSeats] = useState(5);
-  const [homeCharging, setHomeCharging] = useState(true);
   const [shopPriority, setShopPriority] = useState<ShopPriority>("balanced");
 
   const car = cars.find((item) => item.id === carId) ?? DEFAULT_CAR;
@@ -403,7 +425,7 @@ export default function Home() {
     const seatFit = spec.seats >= shopSeats ? 14 : 0;
     const rangeWeight = shopPriority === "range" ? 30 : 20;
     const valueWeight = shopPriority === "value" ? 18 : 8;
-    const chargeWeight = shopPriority === "charging" || !homeCharging ? 18 : 10;
+    const chargeWeight = shopPriority === "charging" ? 18 : 10;
     const rangeFit = Math.min(rangeWeight, (realRange / 450) * rangeWeight);
     const valueFit = Math.min(valueWeight, (realRange / Math.max(1, spec.startingPriceUsd / 1000)) * (valueWeight / 7));
     const chargeFit = Math.min(chargeWeight, (spec.dcFastChargeKw / 300) * chargeWeight);
@@ -414,11 +436,11 @@ export default function Home() {
       ? `Strong capability, but its illustrative starting price is about $${Math.round((spec.startingPriceUsd - shopBudget) / 1000)}k over your budget.`
       : shopPriority === "range"
         ? `A standout for distance, with about ${realRange} miles under the conditions you selected.`
-        : !homeCharging && spec.dcFastChargeKw >= 220
-          ? `Its strong DC charging rate makes life without a home charger easier.`
+        : shopPriority === "charging" && spec.dcFastChargeKw >= 220
+          ? `Its strong DC charging rate makes road-trip stops shorter.`
           : `${candidate.bodyStyle === shopBody || shopBody === "any" ? "Fits your preferred shape" : "A smart alternative shape"} with a useful balance of range, price, and charging.`;
     return { car: candidate, score, realRange, reason };
-  }).sort((a, b) => b.score - a.score).slice(0, 3), [inputs, shopBudget, shopBody, shopSeats, homeCharging, shopPriority]);
+  }).sort((a, b) => b.score - a.score).slice(0, 3), [inputs, shopBudget, shopBody, shopSeats, shopPriority]);
 
   function patchInputs(next: TripInputs) {
     setDistance(next.distanceMi);
@@ -472,6 +494,8 @@ export default function Home() {
         </div>
       </header>
 
+      <Hero />
+
       <section className="lab-shell" aria-label="EV range calculator" data-mode={viewMode}>
         <div className="controls-panel">
           <div className="section-heading">
@@ -483,7 +507,7 @@ export default function Home() {
           </div>
 
           {viewMode === "shop" ? (
-            <ShoppingProfile budget={shopBudget} body={shopBody} seats={shopSeats} homeCharging={homeCharging} priority={shopPriority} onBudget={setShopBudget} onBody={setShopBody} onSeats={setShopSeats} onHomeCharging={setHomeCharging} onPriority={setShopPriority} />
+            <ShoppingProfile budget={shopBudget} body={shopBody} seats={shopSeats} priority={shopPriority} onBudget={setShopBudget} onBody={setShopBody} onSeats={setShopSeats} onPriority={setShopPriority} />
           ) : viewMode === "single" ? (
             <VehiclePicker id="vehicle-a" label="Vehicle" carId={carId} onChange={setCarId} specs={car} />
           ) : (
@@ -547,38 +571,29 @@ export default function Home() {
           />
           <RangeControl label="Average speed" help="Driving faster pushes much more air out of the way. Highway speed usually reduces range the most." value={speed} min={20} max={85} unit=" mph" onChange={setSpeed} />
 
-          <div className="field-grid">
-            <label className="select-label" htmlFor="terrain">
-              Terrain
-              <select id="terrain" value={hills} onChange={(event) => setHills(event.target.value as Hills)}>
-                <option value="flat">Mostly flat</option>
-                <option value="rolling">Rolling hills</option>
-                <option value="steep">Steep hills</option>
-              </select>
-            </label>
-            <label className="select-label" htmlFor="climate">
-              Cabin climate
-              <select id="climate" value={climate} onChange={(event) => setClimate(event.target.value as Climate)}>
-                <option value="off">Off</option>
-                <option value="eco">Eco</option>
-                <option value="normal">Normal</option>
-                <option value="max">Maximum</option>
-              </select>
-            </label>
-          </div>
+          <label className="select-label climate-field" htmlFor="climate">
+            Cabin climate
+            <select id="climate" value={climate} onChange={(event) => setClimate(event.target.value as Climate)}>
+              <option value="off">Off</option>
+              <option value="eco">Eco</option>
+              <option value="normal">Normal</option>
+              <option value="max">Maximum</option>
+            </select>
+          </label>
 
           <div className="preset-block geo">
-            <p className="preset-label">Elevation story</p>
-            <div className="geo-row" role="radiogroup" aria-label="Elevation presets">
+            <p className="preset-label">Landscape</p>
+            <div className="geo-row" role="radiogroup" aria-label="Landscape">
               {geoPresets.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
                   role="radio"
                   aria-checked={activeGeo === preset.id}
-                  className={activeGeo === preset.id ? "active" : ""}
+                  className={`landscape-card ${preset.id}${activeGeo === preset.id ? " active" : ""}`}
                   onClick={() => onGeoPreset(preset.id)}
                 >
+                  <span className="landscape-shape" aria-hidden="true" />
                   <strong>{preset.label}</strong>
                   <span>{preset.hint}</span>
                 </button>
@@ -586,16 +601,6 @@ export default function Home() {
             </div>
           </div>
 
-          <RangeControl
-            label="Net elevation"
-            help="Long climbs use extra energy. You regain some on the way down through regenerative braking, but not all of it."
-            value={elevationGainFt}
-            min={-3000}
-            max={5000}
-            step={100}
-            unit=" ft"
-            onChange={setElevationGainFt}
-          />
           <RangeControl label="Passengers + cargo" help="More people and luggage add weight. The effect is usually smaller than speed or temperature." value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
         </div>
 
@@ -659,7 +664,7 @@ export default function Home() {
           <article role="listitem">
             <span>03</span>
             <h3>Elevation collects a toll</h3>
-            <p>Climbing costs energy. Regeneration gives some back downhill, but never all of it—Mountain Pass makes that vivid.</p>
+            <p>Climbing costs energy. Regeneration gives some back downhill, but never all of it—Mountain pass makes that vivid.</p>
           </article>
         </div>
       </section>
