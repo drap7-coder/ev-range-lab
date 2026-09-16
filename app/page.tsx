@@ -3,6 +3,7 @@
 import { useId, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import { getBrandLogo } from "@/lib/ev/brands";
 import { cars, DEFAULT_CAR, getShopSpec, type EvCar } from "@/lib/ev/cars";
 import {
   estimateTrip,
@@ -112,7 +113,7 @@ function VehiclePicker({
         </select>
       </label>
       <div className="vehicle-card-heading" style={{ "--car-accent": specs.accent } as CSSProperties}>
-        <EvBrandMark className="picker-brand" />
+        <BrandLogo make={specs.make} className="picker-brand" />
         <span><small>{specs.make}</small><strong>{specs.shortName}</strong></span>
       </div>
       <div className="car-specs">
@@ -137,6 +138,15 @@ function EvBrandMark({ className = "" }: { className?: string }) {
   );
 }
 
+function BrandLogo({ make, className = "" }: { make: string; className?: string }) {
+  const logo = getBrandLogo(make);
+  return (
+    <span className={`brand-logo-badge ${logo.shape} ${className}`.trim()} aria-hidden="true">
+      <img className="brand-logo" src={`/brands/${logo.slug}.svg`} alt="" />
+    </span>
+  );
+}
+
 function VehiclePhoto({ car, compact = false }: { car: EvCar; compact?: boolean }) {
   const commonsSearch = `https://commons.wikimedia.org/wiki/Special:MediaSearch?type=image&search=${encodeURIComponent(car.name)}`;
 
@@ -152,7 +162,7 @@ function VehiclePhoto({ car, compact = false }: { car: EvCar; compact?: boolean 
         unoptimized
       />
       <figcaption>
-        <span className="photo-brand"><EvBrandMark className="photo-brand-mark" /><strong>{car.make}</strong></span>
+        <span className="photo-brand"><BrandLogo make={car.make} className="photo-brand-mark" /><strong>{car.make}</strong></span>
         <a href={commonsSearch} target="_blank" rel="noreferrer" aria-label={`View ${car.name} photo source on Wikimedia Commons`}>Photo: Commons ↗</a>
       </figcaption>
     </figure>
@@ -191,7 +201,7 @@ function OutlookCard({
     >
       <div className="result-top">
         <div className="outlook-identity">
-          <span className="outlook-car-line"><EvBrandMark /><span className="outlook-car">{car.shortName}</span></span>
+          <span className="outlook-car-line"><BrandLogo make={car.make} /><span className="outlook-car">{car.shortName}</span></span>
           {moreEfficient ? <span className="efficient-badge">More efficient</span> : null}
         </div>
         <span className={`status ${statusClass(status)}`} role="status">
@@ -316,7 +326,7 @@ function ShoppingResults({ matches, onCompare }: { matches: ShopMatch[]; onCompa
             <article className="shop-match" key={match.car.id} style={{ "--car-accent": match.car.accent } as CSSProperties}>
               <div className="shop-rank">0{index + 1}</div>
               <VehiclePhoto car={match.car} compact />
-              <div className="shop-match-title"><EvBrandMark /><div><small>{match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
+              <div className="shop-match-title"><BrandLogo make={match.car.make} /><div><small>{match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
               <div className="shop-match-metrics"><span><small>From</small><strong>~${Math.round(spec.startingPriceUsd / 1000)}k</strong></span><span><small>Real-life range</small><strong>~{match.realRange} mi</strong></span><span><small>Seats</small><strong>{spec.seats}</strong></span><span><small>DC peak</small><strong>{spec.dcFastChargeKw} kW</strong></span></div>
               <p>{match.reason}</p>
             </article>

@@ -248,10 +248,32 @@ select {
 .vehicle-card-heading > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .vehicle-card-heading small { color: #8ca39c; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
 .vehicle-card-heading strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
-.picker-brand {
-  width: 68px;
-  height: 38px;
-  flex: 0 0 68px;
+.picker-brand { flex: 0 0 auto; }
+.brand-logo-badge {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px;
+  background: #03090c;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 14px rgba(0,0,0,.32);
+}
+.brand-logo-badge.emblem {
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+}
+.brand-logo-badge.wordmark {
+  width: 76px;
+  height: 36px;
+  padding: 7px 9px;
+}
+.brand-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 .ev-brand-mark {
   display: inline-grid;
@@ -450,7 +472,8 @@ input[type="range"]::-webkit-slider-thumb {
   min-width: 0;
 }
 .outlook-car-line { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.outlook-car-line .ev-brand-mark { width: 52px; height: 28px; flex-basis: 52px; }
+.outlook-car-line .brand-logo-badge.emblem { width: 34px; height: 34px; padding: 5px; }
+.outlook-car-line .brand-logo-badge.wordmark { width: 68px; height: 30px; padding: 5px 7px; }
 .outlook-car {
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -510,7 +533,9 @@ input[type="range"]::-webkit-slider-thumb {
   background: rgba(5,10,14,.82);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 7px 18px rgba(0,0,0,.42), 0 0 18px color-mix(in srgb,var(--car-accent) 11%,transparent);
 }
-.photo-brand-mark { width: 46px; height: 26px; flex: 0 0 46px; }
+.photo-brand-mark { flex: 0 0 auto; }
+.photo-brand .brand-logo-badge.emblem { width: 32px; height: 32px; padding: 4px; }
+.photo-brand .brand-logo-badge.wordmark { width: 64px; height: 28px; padding: 4px 7px; }
 .photo-brand strong { color: #fff; font: 750 10px/1 var(--font-sans); letter-spacing: .07em; text-transform: uppercase; }
 .vehicle-photo figcaption a {
   color: rgba(255,255,255,.72);
@@ -1176,8 +1201,9 @@ footer p {
   .outlook-stack.dual .vehicle-photo { min-height: 78px; margin-top: 8px; border-radius: 8px; }
   .outlook-stack.dual .vehicle-photo figcaption { right: 6px; bottom: 6px; left: 6px; }
   .outlook-stack.dual .vehicle-photo figcaption a { display: none; }
-  .outlook-stack.dual .photo-brand { min-width: 0; width: 36px; height: 36px; padding: 4px; border-radius: 7px; }
-  .outlook-stack.dual .photo-brand-mark { width: 28px; height: 28px; flex-basis: 28px; padding: 2px; }
+  .outlook-stack.dual .photo-brand { min-width: 0; width: auto; height: 36px; padding: 4px; border-radius: 7px; }
+  .outlook-stack.dual .photo-brand .brand-logo-badge.emblem { width: 28px; height: 28px; padding: 3px; }
+  .outlook-stack.dual .photo-brand .brand-logo-badge.wordmark { width: 52px; height: 24px; padding: 3px 5px; }
   .outlook-stack.dual .photo-brand strong { display: none; }
   .outlook-card.compact .battery-visual { width: min(100%, 142px); margin-top: 14px; }
   .outlook-card.compact .battery-copy small { font-size: 7px; }
@@ -1213,7 +1239,8 @@ footer p {
 }
 
 /* First-principles pass: one clear brand, less decoration, cleaner mobile comparison. */
-.shop-match-title > .ev-brand-mark { width: 52px; height: 28px; flex-basis: 52px; }
+.shop-match-title > .brand-logo-badge.emblem { width: 40px; height: 40px; }
+.shop-match-title > .brand-logo-badge.wordmark { width: 76px; height: 34px; }
 .how-it-works { padding: 80px 4vw; }
 .explain-heading { padding: 0; }
 .explain-grid {
@@ -1241,15 +1268,18 @@ footer > strong .ev-brand-mark { width: 58px; height: 32px; flex-basis: 58px; }
   .compare-pickers,
   .outlook-stack.dual { grid-template-columns: 1fr; }
   .compare-pickers .vehicle-card-heading { min-height: 58px; flex-direction: row; align-items: center; }
-  .compare-pickers .picker-brand { width: 64px; height: 34px; flex-basis: 64px; }
+  .compare-pickers .brand-logo-badge.emblem { width: 36px; height: 36px; }
+  .compare-pickers .brand-logo-badge.wordmark { width: 64px; height: 32px; }
   .outlook-stack.dual .outlook-card { padding: 16px; border-radius: 14px; }
   .outlook-stack.dual .result-top { min-height: 0; display: flex; }
-  .outlook-stack.dual .outlook-car-line .ev-brand-mark { width: 48px; height: 26px; flex-basis: 48px; }
+  .outlook-stack.dual .outlook-car-line .brand-logo-badge.emblem { width: 32px; height: 32px; }
+  .outlook-stack.dual .outlook-car-line .brand-logo-badge.wordmark { width: 58px; height: 28px; }
   .outlook-stack.dual .outlook-car { font-size: 11px; }
   .outlook-stack.dual .status { width: auto; max-width: 160px; text-align: right; }
   .outlook-stack.dual .vehicle-photo { min-height: 170px; margin-top: 14px; }
   .outlook-stack.dual .photo-brand { width: auto; height: 40px; padding: 6px 9px; }
-  .outlook-stack.dual .photo-brand-mark { width: 42px; height: 24px; flex-basis: 42px; }
+  .outlook-stack.dual .photo-brand .brand-logo-badge.emblem { width: 30px; height: 30px; }
+  .outlook-stack.dual .photo-brand .brand-logo-badge.wordmark { width: 58px; height: 26px; }
   .outlook-stack.dual .photo-brand strong { display: block; }
   .outlook-card.compact .battery-visual { width: min(100%, 240px); }
   .outlook-card.compact .battery-copy small { font-size: 9px; }
