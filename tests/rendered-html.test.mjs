@@ -21,8 +21,10 @@ test("server-renders EV Range Lab without starter metadata", async () => {
   const html = await response.text();
   const normalizedHtml = html.replaceAll("<!-- -->", "");
   assert.match(html, /EV Range Lab/);
-  assert.match(html, /Know your real-world EV range/);
-  assert.match(html, /See the charge you’ll <em>actually<\/em> arrive with/);
+  assert.match(html, /Explore, compare, and find the EV that fits your life/);
+  assert.match(html, /Find the EV that <em>fits your life\.<\/em>/);
+  assert.match(html, /Your EV decision laboratory/);
+  assert.match(html, /Learn · Compare · Choose/);
   assert.match(html, /\/brand\/ev-mark-wide\.png/);
   assert.match(html, /\/icons\/favicon-32-v6\.png/);
   assert.match(html, /\/brands\/tesla\.svg/);

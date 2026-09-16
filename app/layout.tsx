@@ -13,8 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(`${protocol}://${host}`),
-    title: "EV Range Lab — Know your real-world range",
-    description: "Choose an EV, shape the drive, and see your estimated arrival charge instantly.",
+    title: "EV Range Lab — Find the EV that fits your life",
+    description: "Explore 28 EVs, compare models, and test how your real trips and conditions change range.",
     manifest: "/manifest.webmanifest?v=6",
     icons: {
       icon: [
@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       title: "EV Range Lab",
-      description: "Know your real-world EV range before you drive.",
+      description: "Explore, compare, and find the EV that fits your life.",
       images: [{ url: "/og.png", width: 1672, height: 941, alt: "EV Range Lab" }],
     },
     twitter: { card: "summary_large_image", images: ["/og.png"] },

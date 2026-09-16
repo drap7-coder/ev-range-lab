@@ -334,17 +334,18 @@ function ShoppingProfile({
 
 function Hero() {
   return (
-    <section className="hero" aria-label="Introduction">
+    <section className="hero" aria-label="Find the EV that fits your life">
       <div className="hero-copy">
-        <p className="eyebrow">Range before the driveway</p>
-        <h1>See the charge you’ll <em>actually</em> arrive with.</h1>
+        <p className="eyebrow">Your EV decision laboratory</p>
+        <h1>Find the EV that <em>fits your life.</em></h1>
         <p className="lede">
-          Pick an EV, shape the drive, and watch speed, weather, and landscape rewrite the window-sticker number.
+          Explore the models, compare the tradeoffs, and test how your trips, weather, speed, passengers, and landscape
+          change real-world range—before you choose.
         </p>
         <ul className="hero-stats">
-          <li><strong>{cars.length}</strong><span>EVs in the lab</span></li>
-          <li><strong>3</strong><span>landscapes</span></li>
-          <li><strong>Live</strong><span>arrival SoC</span></li>
+          <li><strong>{cars.length}</strong><span>EVs to explore</span></li>
+          <li><strong>3</strong><span>ways to learn</span></li>
+          <li><strong>Live</strong><span>range simulator</span></li>
         </ul>
       </div>
       <div className="hero-stage" aria-hidden="true">
@@ -355,10 +356,10 @@ function Hero() {
           <Image src="/vehicles/model-3-lr.jpg" alt="" fill sizes="(max-width: 860px) 92vw, 480px" unoptimized />
         </figure>
         <div className="hero-float soc">
-          <small>Arrival energy</small>
-          <strong>82%</strong>
+          <small>In the lab</small>
+          <strong>{cars.length} EVs</strong>
         </div>
-        <div className="hero-float chip">Cold + highway</div>
+        <div className="hero-float chip">Learn · Compare · Choose</div>
       </div>
     </section>
   );
