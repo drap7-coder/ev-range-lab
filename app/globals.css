@@ -983,8 +983,14 @@ body {
   color: #e8f0ed;
 }
 .site-header {
+  position: sticky;
+  z-index: 50;
+  top: 0;
   max-width: 1240px;
   border-bottom-color: rgba(113, 229, 218, 0.15);
+  background: rgba(8, 13, 18, 0.94);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(16px);
 }
 .brand { color: #e8f0ed; font-family: var(--font-mono); }
 .brand-mark { filter: drop-shadow(0 0 10px rgba(189, 255, 89, 0.2)); }
