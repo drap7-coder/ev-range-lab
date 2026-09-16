@@ -22,7 +22,7 @@ export type GeoPreset = {
 export const routePresets: RoutePreset[] = [
   {
     id: "winter-commute",
-    label: "❄️ Freezing Winter Commute",
+    label: "Winter commute",
     hint: "Cold battery, full heat, freeway speeds",
     patch: {
       distanceMi: 52,
@@ -37,7 +37,7 @@ export const routePresets: RoutePreset[] = [
   },
   {
     id: "summer-road-trip",
-    label: "🏖️ Summer Family Road Trip",
+    label: "Summer road trip",
     hint: "A/C, luggage, and 75 mph highway driving",
     patch: {
       distanceMi: 220,
@@ -52,7 +52,7 @@ export const routePresets: RoutePreset[] = [
   },
   {
     id: "city-errands",
-    label: "🏙️ City Errands",
+    label: "City errands",
     hint: "Stop-and-go driving helps regeneration",
     patch: {
       distanceMi: 24,

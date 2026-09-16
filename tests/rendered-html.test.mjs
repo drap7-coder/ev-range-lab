@@ -20,7 +20,10 @@ test("server-renders EV Range Lab without starter metadata", async () => {
 
   const html = await response.text();
   assert.match(html, /EV Range Lab/);
-  assert.match(html, /See how far your EV can/);
+  assert.match(html, /Know your real-world EV range/);
+  assert.match(html, /\/brand\/ev-mark-wide\.png/);
   assert.match(html, /Not an OEM warranty range/);
+  assert.doesNotMatch(html, /\/brands\//);
+  assert.doesNotMatch(html, /Gas tank equivalent|GAS VS\. EV/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });

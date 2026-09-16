@@ -82,40 +82,6 @@ function RangeControl({
   );
 }
 
-function tankEquivalent(percent: number) {
-  if (percent <= 0) return "empty";
-  if (percent < 18) return "less than 1/4 tank";
-  if (percent < 38) return "about 1/4 tank";
-  if (percent < 63) return "about 1/2 tank";
-  if (percent < 88) return "about 3/4 tank";
-  return "nearly a full tank";
-}
-
-function CostComparison({ distance, energyKwh }: { distance: number; energyKwh: number }) {
-  const gasCost = (distance / 28) * 3.5;
-  const evCost = energyKwh * 0.16;
-
-  return (
-    <section className="cost-comparison" aria-labelledby="cost-title">
-      <div className="cost-heading">
-        <span>GAS VS. EV</span>
-        <h3 id="cost-title">Same trip. Different routine.</h3>
-      </div>
-      <div className="cost-grid">
-        <article className="cost-card gas-card">
-          <span className="cost-icon" aria-hidden="true">⛽</span>
-          <div><small>Gas vehicle</small><strong>~${Math.round(gasCost)}</strong><p>Estimated fuel cost, plus a gas station visit.</p></div>
-        </article>
-        <article className="cost-card ev-card">
-          <span className="cost-icon" aria-hidden="true">⚡</span>
-          <div><small>Electric vehicle</small><strong>~${Math.round(evCost)}</strong><p>Estimated home charging cost—and you can start each morning full.</p></div>
-        </article>
-      </div>
-      <p className="cost-assumptions">Illustrative comparison: 28 mpg at $3.50/gal vs. home charging at $0.16/kWh.</p>
-    </section>
-  );
-}
-
 function VehiclePicker({
   id,
   label,
@@ -146,7 +112,7 @@ function VehiclePicker({
         </select>
       </label>
       <div className="vehicle-card-heading" style={{ "--car-accent": specs.accent } as CSSProperties}>
-        <span className="picker-brand"><span className="brand-logo-badge"><BrandLogo make={specs.make} /></span><CarSilhouette car={specs} /></span>
+        <EvBrandMark className="picker-brand" />
         <span><small>{specs.make}</small><strong>{specs.shortName}</strong></span>
       </div>
       <div className="car-specs">
@@ -163,19 +129,12 @@ function VehiclePicker({
   );
 }
 
-function CarSilhouette({ car }: { car: EvCar }) {
+function EvBrandMark({ className = "" }: { className?: string }) {
   return (
-    <span className={`mini-car ${car.bodyStyle}`} aria-hidden="true">
-      <span className="mini-car-body" />
-      <span className="mini-wheel front" />
-      <span className="mini-wheel rear" />
+    <span className={`ev-brand-mark ${className}`.trim()} aria-hidden="true">
+      <Image src="/brand/ev-mark-wide.png" alt="" width={900} height={480} unoptimized />
     </span>
   );
-}
-
-function BrandLogo({ make }: { make: string }) {
-  const slug = make.toLowerCase();
-  return <img className="brand-logo" src={`/brands/${slug}.svg`} alt={`${make} logo`} loading="lazy" />;
 }
 
 function VehiclePhoto({ car, compact = false }: { car: EvCar; compact?: boolean }) {
@@ -184,13 +143,16 @@ function VehiclePhoto({ car, compact = false }: { car: EvCar; compact?: boolean 
   return (
     <figure className={`vehicle-photo${compact ? " compact" : ""}`}>
       <Image
+        className="vehicle-image"
         src={`/vehicles/${car.id}.jpg`}
         alt={`${car.name} exterior`}
         fill
-        sizes={compact ? "(max-width: 560px) 42vw, 240px" : "(max-width: 860px) 92vw, 520px"}
+        sizes={compact ? "(max-width: 560px) 90vw, 240px" : "(max-width: 860px) 92vw, 520px"}
+        priority={!compact}
+        unoptimized
       />
       <figcaption>
-        <span className="photo-brand"><span className="photo-brand-mark"><BrandLogo make={car.make} /></span><strong>{car.make}</strong></span>
+        <span className="photo-brand"><EvBrandMark className="photo-brand-mark" /><strong>{car.make}</strong></span>
         <a href={commonsSearch} target="_blank" rel="noreferrer" aria-label={`View ${car.name} photo source on Wikimedia Commons`}>Photo: Commons ↗</a>
       </figcaption>
     </figure>
@@ -229,7 +191,7 @@ function OutlookCard({
     >
       <div className="result-top">
         <div className="outlook-identity">
-          <span className="outlook-car-line"><CarSilhouette car={car} /><span className="outlook-car">{car.shortName}</span></span>
+          <span className="outlook-car-line"><EvBrandMark /><span className="outlook-car">{car.shortName}</span></span>
           {moreEfficient ? <span className="efficient-badge">More efficient</span> : null}
         </div>
         <span className={`status ${statusClass(status)}`} role="status">
@@ -253,14 +215,6 @@ function OutlookCard({
           </strong>
           <span>after {distance} miles</span>
         </div>
-      </div>
-
-      <div className="tank-equivalent">
-        <div className="tank-label">
-          <small>Gas tank equivalent</small>
-          <strong>Arrives with {tankEquivalent(estimate.endBatteryPct)} remaining</strong>
-        </div>
-        <div className="tank-track" aria-hidden="true"><span style={{ width: `${gauge}%` }} /></div>
       </div>
 
       <div className="metrics beginner-metrics">
@@ -362,7 +316,7 @@ function ShoppingResults({ matches, onCompare }: { matches: ShopMatch[]; onCompa
             <article className="shop-match" key={match.car.id} style={{ "--car-accent": match.car.accent } as CSSProperties}>
               <div className="shop-rank">0{index + 1}</div>
               <VehiclePhoto car={match.car} compact />
-              <div className="shop-match-title"><CarSilhouette car={match.car} /><div><small>{match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
+              <div className="shop-match-title"><EvBrandMark /><div><small>{match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
               <div className="shop-match-metrics"><span><small>From</small><strong>~${Math.round(spec.startingPriceUsd / 1000)}k</strong></span><span><small>Real-life range</small><strong>~{match.realRange} mi</strong></span><span><small>Seats</small><strong>{spec.seats}</strong></span><span><small>DC peak</small><strong>{spec.dcFastChargeKw} kW</strong></span></div>
               <p>{match.reason}</p>
             </article>
@@ -479,10 +433,11 @@ export default function Home() {
     <main id="top">
       <header className="site-header">
         <a className="brand" href="#top" aria-label="EV Range Lab home">
-          <span className="brand-mark" aria-hidden="true">
-            <img src="/icons/pwa-192-v4.png" alt="" width={42} height={42} />
+          <EvBrandMark className="brand-mark" />
+          <span className="brand-copy">
+            <span className="brand-name"><b>EV</b> Range Lab</span>
+            <small>Know your range.</small>
           </span>
-          <span className="brand-name">EV Range Lab</span>
         </a>
         <div className="header-controls">
           <div className="mode-toggle" role="group" aria-label="Vehicle view">
@@ -668,7 +623,6 @@ export default function Home() {
             ) : null}
           </div>
 
-          <CostComparison distance={distance} energyKwh={result.energyUsedKwh} />
           </>
           )}
         </aside>
@@ -678,9 +632,8 @@ export default function Home() {
         <div className="explain-heading">
           <div>
             <p className="eyebrow">What changes range?</p>
-            <h2>Three forces do most of the work.</h2>
+            <h2>Three inputs matter most.</h2>
           </div>
-          <p className="scroll-cue" aria-hidden="true"><span>Scroll to explore</span><i>→</i></p>
         </div>
         <div className="explain-grid" role="list" aria-label="The three biggest forces affecting EV range">
           <article role="listitem">
@@ -702,7 +655,7 @@ export default function Home() {
       </section>
 
       <footer>
-        <strong>EV Range Lab</strong>
+        <strong><EvBrandMark />EV Range Lab</strong>
         <p>
           Educational estimates only. Actual range varies by vehicle, battery health, weather, traffic, tires, and driving style. Not
           an OEM warranty range.

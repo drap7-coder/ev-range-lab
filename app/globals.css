@@ -44,20 +44,30 @@ main { min-height: 100vh; }
   letter-spacing: -0.03em;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
 .brand-name {
   display: inline-block;
   white-space: nowrap;
 }
+.brand-name b { color: var(--lime); }
+.brand-copy { display: flex; flex-direction: column; gap: 3px; }
+.brand-copy small {
+  color: #8fa19d;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
 .brand-mark {
-  width: 42px;
-  height: 42px;
+  width: 92px;
+  height: 50px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
 }
-.brand-mark img { display: block; width: 100%; height: 100%; border-radius: 10px; }
+.brand-mark img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .header-controls {
   display: flex;
   align-items: center;
@@ -239,50 +249,22 @@ select {
 .vehicle-card-heading small { color: #8ca39c; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
 .vehicle-card-heading strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
 .picker-brand {
-  display: flex;
-  width: 64px;
-  flex: 0 0 64px;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  width: 68px;
+  height: 38px;
+  flex: 0 0 68px;
 }
-.brand-logo-badge {
-  display: grid;
-  width: 58px;
-  height: 32px;
-  padding: 5px 9px;
-  place-items: center;
-  border: 1px solid rgba(255,255,255,.17);
-  border-radius: 8px;
-  background: linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.035));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12),0 5px 12px rgba(0,0,0,.28);
-}
-.brand-logo { display: block; width: 100%; height: 100%; object-fit: contain; }
-
-.mini-car {
-  position: relative;
-  display: inline-block;
-  width: 50px;
+.ev-brand-mark {
+  display: inline-grid;
+  width: 46px;
   height: 26px;
-  flex: 0 0 50px;
-  color: var(--car-accent);
+  flex: 0 0 46px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #03090c;
+  box-shadow: 0 0 18px rgba(113,229,218,.1);
 }
-.mini-car-body {
-  position: absolute;
-  left: 1px;
-  right: 1px;
-  bottom: 6px;
-  height: 15px;
-  background: currentColor;
-  clip-path: polygon(0 56%, 13% 52%, 25% 12%, 67% 12%, 82% 50%, 100% 56%, 100% 86%, 0 86%);
-}
-.mini-car.suv .mini-car-body { height: 18px; clip-path: polygon(0 50%, 10% 45%, 18% 6%, 76% 6%, 88% 48%, 100% 55%, 100% 86%, 0 86%); }
-.mini-car.crossover .mini-car-body { height: 17px; clip-path: polygon(0 54%, 12% 49%, 23% 8%, 71% 8%, 85% 50%, 100% 56%, 100% 86%, 0 86%); }
-.mini-car.truck .mini-car-body { height: 18px; clip-path: polygon(0 48%, 10% 44%, 18% 8%, 52% 8%, 62% 50%, 100% 50%, 100% 86%, 0 86%); }
-.mini-wheel { position: absolute; bottom: 2px; width: 10px; height: 10px; border: 2px solid currentColor; border-radius: 50%; background: #0a1016; }
-.vehicle-card-heading .mini-wheel { background: #0d141b; }
-.mini-wheel.front { right: 7px; }
-.mini-wheel.rear { left: 7px; }
+.ev-brand-mark img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 .preset-block { margin-bottom: 20px; }
 .preset-block.geo { margin-top: 8px; }
@@ -468,8 +450,7 @@ input[type="range"]::-webkit-slider-thumb {
   min-width: 0;
 }
 .outlook-car-line { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.outlook-car-line .mini-car { width: 42px; height: 23px; flex-basis: 42px; }
-.outlook-car-line .mini-wheel { width: 9px; height: 9px; }
+.outlook-car-line .ev-brand-mark { width: 52px; height: 28px; flex-basis: 52px; }
 .outlook-car {
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -495,7 +476,11 @@ input[type="range"]::-webkit-slider-thumb {
   pointer-events: none;
   background: linear-gradient(180deg, transparent 50%, rgba(2,6,9,.82) 100%), linear-gradient(135deg, rgba(255,255,255,.08), transparent 32%);
 }
-.vehicle-photo img {
+.vehicle-photo > .vehicle-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center 58%;
   filter: saturate(.88) contrast(1.06) brightness(.88);
@@ -525,7 +510,7 @@ input[type="range"]::-webkit-slider-thumb {
   background: rgba(5,10,14,.82);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 7px 18px rgba(0,0,0,.42), 0 0 18px color-mix(in srgb,var(--car-accent) 11%,transparent);
 }
-.photo-brand-mark { display: grid; width: 32px; height: 32px; flex: 0 0 32px; padding: 3px; place-items: center; }
+.photo-brand-mark { width: 46px; height: 26px; flex: 0 0 46px; }
 .photo-brand strong { color: #fff; font: 750 10px/1 var(--font-sans); letter-spacing: .07em; text-transform: uppercase; }
 .vehicle-photo figcaption a {
   color: rgba(255,255,255,.72);
@@ -541,8 +526,8 @@ input[type="range"]::-webkit-slider-thumb {
 .shop-match .vehicle-photo figcaption { right: 9px; bottom: 8px; left: 9px; }
 .shop-match .vehicle-photo + .shop-match-title { padding-top: 2px; }
 @media (hover:hover) and (pointer:fine) {
-  .outlook-card:hover .vehicle-photo img,
-  .shop-match:hover .vehicle-photo img { transform: scale(1.055); filter: saturate(1) contrast(1.08) brightness(.94); }
+  .outlook-card:hover .vehicle-photo > .vehicle-image,
+  .shop-match:hover .vehicle-photo > .vehicle-image { transform: scale(1.055); filter: saturate(1) contrast(1.08) brightness(.94); }
 }
 .efficient-badge {
   display: inline-flex;
@@ -664,35 +649,6 @@ input[type="range"]::-webkit-slider-thumb {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 10px;
 }
-.tank-equivalent {
-  margin: 0 0 16px;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.09);
-}
-.tank-label { display: flex; flex-direction: column; gap: 5px; }
-.tank-label small {
-  color: #a9b7b2;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-.tank-label strong { font-size: 15px; line-height: 1.3; }
-.tank-track {
-  height: 12px;
-  margin-top: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-}
-.tank-track span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #80d83f, var(--car-accent));
-  transition: width 0.4s ease;
-}
 .metrics div {
   padding: 16px;
   display: flex;
@@ -743,29 +699,6 @@ input[type="range"]::-webkit-slider-thumb {
   font-size: 14px;
 }
 
-.cost-comparison {
-  margin-top: 22px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-}
-.cost-heading > span { color: var(--lime); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; }
-.cost-heading h3 { margin: 6px 0 14px; font-size: 20px; letter-spacing: -0.035em; }
-.cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.cost-card {
-  display: flex;
-  gap: 12px;
-  min-width: 0;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08);
-}
-.cost-card.ev-card { background: rgba(189, 255, 89, 0.1); border: 1px solid rgba(189, 255, 89, 0.24); }
-.cost-icon { font-size: 20px; }
-.cost-card div { min-width: 0; }
-.cost-card small { display: block; color: #a9b7b2; font-size: 10px; text-transform: uppercase; }
-.cost-card strong { display: block; margin: 5px 0; font-size: 25px; }
-.cost-card p { margin: 0; color: rgba(255, 255, 255, 0.76); font-size: 11px; line-height: 1.45; }
-.cost-assumptions { margin: 10px 0 0; color: #8fa099; font-size: 9px; line-height: 1.45; }
 .shop-profile { display: grid; gap: 20px; }
 .shop-field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .charge-at-home { margin: 0; padding: 0; border: 0; }
@@ -801,9 +734,7 @@ input[type="range"]::-webkit-slider-thumb {
 /* Dimensional card system: layered surfaces, precise highlights, and restrained motion. */
 .outlook-card,
 .shop-match,
-.cost-card,
 .tip-card,
-.tank-equivalent,
 .mobile-shopping-results {
   isolation: isolate;
   border: 1px solid rgba(145, 240, 228, 0.16);
@@ -824,8 +755,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 18px;
 }
 .outlook-card::before,
-.shop-match::before,
-.cost-card::before {
+.shop-match::before {
   content: "";
   position: absolute;
   z-index: -1;
@@ -836,8 +766,7 @@ input[type="range"]::-webkit-slider-thumb {
     linear-gradient(110deg, transparent 15%, rgba(255, 255, 255, 0.035) 38%, transparent 60%);
 }
 .outlook-card::after,
-.shop-match::after,
-.cost-card::after {
+.shop-match::after {
   content: "";
   position: absolute;
   z-index: 3;
@@ -893,21 +822,12 @@ input[type="range"]::-webkit-slider-thumb {
   pointer-events: none;
   background: linear-gradient(145deg, rgba(255,255,255,.12), transparent 22%, transparent 72%, rgba(0,0,0,.34));
 }
-.tank-equivalent,
 .metrics,
 .tip-card,
 .charge-tip,
 .shop-match-metrics {
   backdrop-filter: blur(12px);
 }
-.tank-equivalent {
-  border-color: rgba(113, 229, 218, 0.16);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 8px 18px rgba(0,0,0,.16);
-}
-.tank-track {
-  box-shadow: inset 0 2px 5px rgba(0,0,0,.65), 0 1px 0 rgba(255,255,255,.04);
-}
-.tank-track span { box-shadow: 0 0 16px color-mix(in srgb, var(--car-accent) 44%, transparent), inset 0 1px 0 rgba(255,255,255,.45); }
 .metrics {
   overflow: hidden;
   border-color: rgba(113, 229, 218, 0.16);
@@ -921,17 +841,6 @@ input[type="range"]::-webkit-slider-thumb {
   border-left: 3px solid var(--lime);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 22px rgba(0,0,0,.18);
 }
-.cost-card {
-  position: relative;
-  overflow: hidden;
-  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
-}
-.cost-card.ev-card {
-  border-color: rgba(189, 255, 89, 0.36);
-  background: linear-gradient(145deg, rgba(189,255,89,.13), transparent 42%), linear-gradient(160deg, #17221d, #0b1212 58%, #080d12);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 14px 30px rgba(0,0,0,.24), 0 0 24px rgba(189,255,89,.07);
-}
-.cost-card strong { color: #f7fcfa; text-shadow: 0 0 20px rgba(113,229,218,.15); }
 .shop-match-list { gap: 16px; perspective: 1200px; }
 .shop-match {
   border-radius: 16px;
@@ -964,8 +873,7 @@ input[type="range"]::-webkit-slider-thumb {
   transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  .shop-match:hover,
-  .cost-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb,var(--car-accent, #71e5da) 48%,rgba(255,255,255,.1)); box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 24px 44px rgba(0,0,0,.34), 0 0 30px color-mix(in srgb,var(--car-accent, #71e5da) 9%,transparent); }
+  .shop-match:hover { transform: translateY(-4px); border-color: color-mix(in srgb,var(--car-accent, #71e5da) 48%,rgba(255,255,255,.1)); box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 24px 44px rgba(0,0,0,.34), 0 0 30px color-mix(in srgb,var(--car-accent, #71e5da) 9%,transparent); }
   .compare-matches:hover { transform: translateY(-2px); filter: brightness(1.04); box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -2px 0 rgba(5,15,12,.3), 0 15px 30px rgba(189,255,89,.23); }
 }
 .compare-matches:active { transform: translateY(1px); }
@@ -1046,7 +954,6 @@ select {
 input[type="range"] { background: #25313a; }
 input[type="range"]::-webkit-slider-thumb { background: #0a1016; border-color: #71e5da; }
 .result-top { font-family: var(--font-mono); }
-.tank-track { height: 10px; background: #273139; }
 footer { max-width: 1240px; color: #e8f0ed; border-color: rgba(113, 229, 218, 0.15); }
 footer p { color: #83948f; }
 
@@ -1240,7 +1147,6 @@ footer p {
   .compare-pickers .car-specs span { padding: 10px 8px; }
   .compare-pickers .car-specs small { font-size: 8px; }
   .compare-pickers .car-specs strong { font-size: 12px; }
-  .compare-pickers .mini-car { width: 40px; height: 22px; flex-basis: 22px; }
   .field-grid { grid-template-columns: 1fr; gap: 18px; }
   .shop-field-grid { grid-template-columns: 1fr; }
   .mobile-shopping-results { margin-inline: -6px; padding: 20px 12px; }
@@ -1253,7 +1159,6 @@ footer p {
   .shop-match-metrics span:nth-child(4) { border-top: 1px solid rgba(255,255,255,.12); }
   .preset-row { grid-template-columns: 1fr; }
   .preset-row button { min-height: 0; }
-  .cost-grid { grid-template-columns: 1fr; }
   .battery-visual { width: min(100%, 320px); height: auto; }
   .battery-copy strong { font-size: 76px; }
   .outlook-stack.dual { gap: 8px; }
@@ -1265,7 +1170,6 @@ footer p {
     gap: 8px;
   }
   .outlook-stack.dual .outlook-car-line { gap: 5px; }
-  .outlook-stack.dual .outlook-car-line .mini-car { width: 34px; height: 20px; flex-basis: 34px; }
   .outlook-stack.dual .outlook-car { font-size: 9px; letter-spacing: .04em; }
   .outlook-stack.dual .efficient-badge { padding: 3px 5px; font-size: 7px; }
   .outlook-stack.dual .status { width: 100%; max-width: none; padding: 8px; font-size: 10px; text-align: left; }
@@ -1279,9 +1183,6 @@ footer p {
   .outlook-card.compact .battery-copy small { font-size: 7px; }
   .outlook-card.compact .battery-copy strong { font-size: 42px; }
   .outlook-card.compact .battery-copy span { margin-top: 4px; font-size: 9px; }
-  .outlook-stack.dual .tank-equivalent { padding: 10px 8px; }
-  .outlook-stack.dual .tank-label small { font-size: 8px; }
-  .outlook-stack.dual .tank-label strong { font-size: 11px; }
   .outlook-stack.dual .metrics small { font-size: 8px; }
   .outlook-stack.dual .metrics strong { font-size: 11px; }
   .outlook-stack.dual .tip-card { padding: 12px 10px; }
@@ -1309,4 +1210,51 @@ footer p {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* First-principles pass: one clear brand, less decoration, cleaner mobile comparison. */
+.shop-match-title > .ev-brand-mark { width: 52px; height: 28px; flex-basis: 52px; }
+.how-it-works { padding: 80px 4vw; }
+.explain-heading { padding: 0; }
+.explain-grid {
+  grid-auto-flow: initial;
+  grid-auto-columns: initial;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 40px;
+  padding: 0;
+  overflow: visible;
+}
+.explain-grid article { min-height: 290px; }
+.explain-grid h3 { margin-top: 72px; }
+footer > strong { display: flex; align-items: center; gap: 10px; }
+footer > strong .ev-brand-mark { width: 58px; height: 32px; flex-basis: 58px; }
+
+@media (max-width: 860px) {
+  .explain-grid { grid-template-columns: 1fr; }
+  .explain-grid article { min-height: 240px; }
+  .explain-grid h3 { margin-top: 52px; }
+}
+
+@media (max-width: 560px) {
+  .brand-mark { width: 78px; height: 42px; }
+  .brand-name { font-size: 16px; }
+  .compare-pickers,
+  .outlook-stack.dual { grid-template-columns: 1fr; }
+  .compare-pickers .vehicle-card-heading { min-height: 58px; flex-direction: row; align-items: center; }
+  .compare-pickers .picker-brand { width: 64px; height: 34px; flex-basis: 64px; }
+  .outlook-stack.dual .outlook-card { padding: 16px; border-radius: 14px; }
+  .outlook-stack.dual .result-top { min-height: 0; display: flex; }
+  .outlook-stack.dual .outlook-car-line .ev-brand-mark { width: 48px; height: 26px; flex-basis: 48px; }
+  .outlook-stack.dual .outlook-car { font-size: 11px; }
+  .outlook-stack.dual .status { width: auto; max-width: 160px; text-align: right; }
+  .outlook-stack.dual .vehicle-photo { min-height: 170px; margin-top: 14px; }
+  .outlook-stack.dual .photo-brand { width: auto; height: 40px; padding: 6px 9px; }
+  .outlook-stack.dual .photo-brand-mark { width: 42px; height: 24px; flex-basis: 42px; }
+  .outlook-stack.dual .photo-brand strong { display: block; }
+  .outlook-card.compact .battery-visual { width: min(100%, 240px); }
+  .outlook-card.compact .battery-copy small { font-size: 9px; }
+  .outlook-card.compact .battery-copy strong { font-size: 60px; }
+  .outlook-card.compact .battery-copy span { font-size: 12px; }
+  .metrics { grid-template-columns: repeat(3, 1fr); }
+  .metrics div + div { border-top: 0; border-left: 1px solid rgba(255, 255, 255, 0.15); }
 }
