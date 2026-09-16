@@ -19,13 +19,17 @@ test("server-renders EV Range Lab without starter metadata", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
+  const normalizedHtml = html.replaceAll("<!-- -->", "");
   assert.match(html, /EV Range Lab/);
   assert.match(html, /Know your real-world EV range/);
   assert.match(html, /See the charge you’ll <em>actually<\/em> arrive with/);
   assert.match(html, /\/brand\/ev-mark-wide\.png/);
   assert.match(html, /\/icons\/favicon-32-v6\.png/);
   assert.match(html, /\/brands\/tesla\.svg/);
-  assert.match(html, /Not an OEM warranty range/);
+  assert.match(html, /Stated range/);
+  assert.match(normalizedHtml, /2025 Tesla Model 3 Long Range — 305 mi stated/);
+  assert.match(html, /Your conditions/);
+  assert.match(html, /not an OEM warranty range/);
   assert.match(html, /Landscape/);
   assert.doesNotMatch(html, /Home charging|Net elevation|id="terrain"/);
   assert.doesNotMatch(html, /Gas tank equivalent|GAS VS\. EV/);

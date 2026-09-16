@@ -31,6 +31,24 @@ const baseInputs = {
   elevationGainFt: 0,
 };
 
+test("every catalog vehicle has a model year and a stated-range baseline", () => {
+  assert.equal(cars.length, 28);
+  for (const car of cars) {
+    assert.ok(car.modelYear >= 2025, `${car.id} needs a current model year`);
+    assert.ok(car.statedRangeMi > 0, `${car.id} needs a stated range`);
+    assert.match(car.rangeBasis, /est\.$/);
+
+    const modeledBaseline = (car.usableBatteryKwh * 1000) / car.baselineWhPerMi;
+    assert.ok(
+      Math.abs(modeledBaseline - car.statedRangeMi) <= 1.5,
+      `${car.id} baseline should start from its stated range`,
+    );
+  }
+
+  assert.equal(cars.find((car) => car.id === "hummer-pickup")?.statedRangeMi, 340);
+  assert.equal(cars.find((car) => car.id === "rivian-r1s")?.statedRangeMi, 349);
+});
+
 test("SoC thresholds map to ready / low / insufficient", () => {
   assert.equal(getArrivalStatus(40), "ready");
   assert.equal(getArrivalStatus(15), "ready");

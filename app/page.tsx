@@ -106,7 +106,9 @@ function VehiclePicker({
           {makes.map((make) => (
             <optgroup key={make} label={make}>
               {cars.filter((item) => item.make === make).map((item) => (
-                <option key={item.id} value={item.id}>{item.name}</option>
+                <option key={item.id} value={item.id}>
+                  {item.modelYear} {item.name} — {item.statedRangeMi} mi stated
+                </option>
               ))}
             </optgroup>
           ))}
@@ -114,7 +116,7 @@ function VehiclePicker({
       </label>
       <div className="vehicle-card-heading" style={{ "--car-accent": specs.accent } as CSSProperties}>
         <BrandLogo make={specs.make} className="picker-brand" />
-        <span><small>{specs.make}</small><strong>{specs.shortName}</strong></span>
+        <span><small>{specs.modelYear} · {specs.make}</small><strong>{specs.shortName}</strong></span>
       </div>
       <div className="car-specs">
         <span>
@@ -122,8 +124,8 @@ function VehiclePicker({
           <strong>{specs.usableBatteryKwh} kWh</strong>
         </span>
         <span>
-          <small>Reference range</small>
-          <strong>{specs.referenceRangeMi} mi</strong>
+          <small>Stated range · {specs.rangeBasis}</small>
+          <strong>{specs.statedRangeMi} mi</strong>
         </span>
       </div>
     </div>
@@ -192,6 +194,11 @@ function OutlookCard({
 }) {
   const gauge = Math.min(100, Math.max(0, estimate.endBatteryPct));
   const status = estimate.arrivalStatus;
+  const conditionsRange = Math.max(0, Math.round((car.usableBatteryKwh * 1000) / estimate.whPerMi));
+  const rangeImpact = conditionsRange - car.statedRangeMi;
+  const rangeImpactLabel = rangeImpact === 0
+    ? "Matches rating"
+    : `${Math.abs(rangeImpact)} mi ${rangeImpact > 0 ? "more" : "less"}`;
 
   return (
     <article
@@ -201,7 +208,13 @@ function OutlookCard({
     >
       <div className="result-top">
         <div className="outlook-identity">
-          <span className="outlook-car-line"><BrandLogo make={car.make} /><span className="outlook-car">{car.shortName}</span></span>
+          <span className="outlook-car-line">
+            <BrandLogo make={car.make} />
+            <span className="outlook-car-copy">
+              <span className="outlook-car">{car.shortName}</span>
+              <small>{car.modelYear} · {car.rangeBasis} {car.statedRangeMi} mi</small>
+            </span>
+          </span>
           {moreEfficient ? <span className="efficient-badge">More efficient</span> : null}
         </div>
         <span className={`status ${statusClass(status)}`} role="status">
@@ -210,6 +223,19 @@ function OutlookCard({
       </div>
 
       <VehiclePhoto car={car} compact={compact} />
+
+      <div className="range-story" aria-label={`${car.statedRangeMi} miles stated range becomes about ${conditionsRange} miles in your selected conditions`}>
+        <span>
+          <small>{car.modelYear} stated range</small>
+          <strong>{car.statedRangeMi} mi</strong>
+        </span>
+        <b aria-hidden="true">→</b>
+        <span>
+          <small>Your conditions</small>
+          <strong>~{conditionsRange} mi</strong>
+        </span>
+        <em className={rangeImpact < 0 ? "negative" : rangeImpact > 0 ? "positive" : "neutral"}>{rangeImpactLabel}</em>
+      </div>
 
       <div
         className="battery-visual"
@@ -349,15 +375,15 @@ function ShoppingResults({ matches, onCompare }: { matches: ShopMatch[]; onCompa
             <article className="shop-match" key={match.car.id} style={{ "--car-accent": match.car.accent } as CSSProperties}>
               <div className="shop-rank">0{index + 1}</div>
               <VehiclePhoto car={match.car} compact />
-              <div className="shop-match-title"><BrandLogo make={match.car.make} /><div><small>{match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
-              <div className="shop-match-metrics"><span><small>From</small><strong>~${Math.round(spec.startingPriceUsd / 1000)}k</strong></span><span><small>Real-life range</small><strong>~{match.realRange} mi</strong></span><span><small>Seats</small><strong>{spec.seats}</strong></span><span><small>DC peak</small><strong>{spec.dcFastChargeKw} kW</strong></span></div>
+              <div className="shop-match-title"><BrandLogo make={match.car.make} /><div><small>{match.car.modelYear} · {match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
+              <div className="shop-match-metrics"><span><small>Stated · {match.car.rangeBasis}</small><strong>{match.car.statedRangeMi} mi</strong></span><span><small>Your conditions</small><strong>~{match.realRange} mi</strong></span><span><small>From</small><strong>~${Math.round(spec.startingPriceUsd / 1000)}k</strong></span><span><small>Seats</small><strong>{spec.seats}</strong></span></div>
               <p>{match.reason}</p>
             </article>
           );
         })}
       </div>
       {matches.length >= 2 ? <button className="compare-matches" type="button" onClick={() => onCompare(matches[0].car, matches[1].car)}>Compare the top two</button> : null}
-      <p className="shopping-disclaimer">Shopping data is illustrative and can change by trim, options, incentives, and model year. Confirm pricing and specifications with the manufacturer before purchasing.</p>
+      <p className="shopping-disclaimer">Stated range is the listed EPA or manufacturer estimate for that model year and trim. Pricing and specifications can change; confirm them before purchasing.</p>
     </div>
   );
 }
@@ -672,8 +698,8 @@ export default function Home() {
       <footer>
         <strong><EvBrandMark />EV Range Lab</strong>
         <p>
-          Educational estimates only. Actual range varies by vehicle, battery health, weather, traffic, tires, and driving style. Not
-          an OEM warranty range.
+          Stated range is the listed EPA or manufacturer estimate for the model year and trim. EV Range Lab results are educational,
+          not an OEM warranty range; actual range varies with battery health, weather, traffic, tires, and driving style.
         </p>
       </footer>
     </main>
