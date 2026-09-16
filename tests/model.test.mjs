@@ -45,8 +45,8 @@ test("every catalog vehicle has a model year and a stated-range baseline", () =>
     );
   }
 
-  assert.equal(cars.find((car) => car.id === "hummer-pickup")?.statedRangeMi, 340);
-  assert.equal(cars.find((car) => car.id === "rivian-r1s")?.statedRangeMi, 349);
+  assert.equal(cars.find((car) => car.id === "hummer-pickup")?.statedRangeMi, 367);
+  assert.equal(cars.find((car) => car.id === "rivian-r1s")?.statedRangeMi, 330);
 });
 
 test("SoC thresholds map to ready / low / insufficient", () => {
