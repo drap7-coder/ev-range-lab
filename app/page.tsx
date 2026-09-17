@@ -259,10 +259,6 @@ function OutlookCard({
           <strong>~{Math.round(estimate.remainingRangeMi)} mi</strong>
         </div>
         <div>
-          <small>Stops needed</small>
-          <strong>{status === "ready" ? "None" : "Plan one"}</strong>
-        </div>
-        <div>
           <small>Starting charge</small>
           <strong>{startBattery}%</strong>
         </div>

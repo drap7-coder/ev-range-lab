@@ -454,6 +454,16 @@ input[type="range"]::-webkit-slider-thumb {
 
 .outlook-stack { display: grid; gap: 18px; }
 .outlook-stack.dual { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
+@media (min-width: 561px) {
+  @supports (grid-template-rows: subgrid) {
+    .outlook-stack.dual { column-gap: 14px; row-gap: 0; }
+    .outlook-stack.dual .outlook-card {
+      display: grid;
+      grid-row: span 7;
+      grid-template-rows: subgrid;
+    }
+  }
+}
 .outlook-card {
   min-width: 0;
   display: flex;
@@ -723,7 +733,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 10px;
 }
@@ -1561,6 +1571,6 @@ footer > strong .ev-brand-mark { width: 58px; height: 32px; flex-basis: 58px; }
   .outlook-card.compact .battery-copy small { font-size: 9px; }
   .outlook-card.compact .battery-copy strong { font-size: 60px; }
   .outlook-card.compact .battery-copy span { font-size: 12px; }
-  .metrics { grid-template-columns: repeat(3, 1fr); }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
   .metrics div + div { border-top: 0; border-left: 1px solid rgba(255, 255, 255, 0.15); }
 }
