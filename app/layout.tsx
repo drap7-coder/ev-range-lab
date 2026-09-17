@@ -27,9 +27,9 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: "EV Range Lab",
       description: "Explore, compare, and find the EV that fits your life.",
-      images: [{ url: "/og.png", width: 1672, height: 941, alt: "EV Range Lab" }],
+      images: [{ url: "/og-premium.png", width: 1672, height: 941, alt: "EV Range Lab — Find the EV that fits your life" }],
     },
-    twitter: { card: "summary_large_image", images: ["/og.png"] },
+    twitter: { card: "summary_large_image", images: ["/og-premium.png"] },
   };
 }
 

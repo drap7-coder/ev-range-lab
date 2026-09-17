@@ -63,7 +63,7 @@ function RangeControl({
           {label}
         </label>
         <span className="info-wrap">
-          <button className="info-button" type="button" aria-label={`Why ${label.toLowerCase()} matters`}>?</button>
+          <button className="info-button" type="button" aria-label={`Why ${label.toLowerCase()} matters`} />
           <span className="info-popover" role="tooltip">{help}</span>
         </span>
         <strong>
@@ -146,7 +146,7 @@ function BrandLogo({ make, className = "" }: { make: string; className?: string 
   const logo = getBrandLogo(make);
   return (
     <span className={`brand-logo-badge ${logo.shape} ${className}`.trim()} aria-hidden="true">
-      <img className="brand-logo" src={`/brands/${logo.slug}.svg?v=3`} alt="" />
+      <Image className="brand-logo" src={`/brands/${logo.slug}.svg?v=3`} alt="" width={96} height={48} unoptimized />
     </span>
   );
 }
@@ -205,9 +205,6 @@ function OutlookCard({
   startBattery,
   tip,
   charge,
-  moreEfficient,
-  compact,
-  reserveChargeSpace,
 }: {
   car: EvCar;
   estimate: TripEstimate;
@@ -215,9 +212,6 @@ function OutlookCard({
   startBattery: number;
   tip: string;
   charge: ReturnType<typeof getChargeRecommendation>;
-  moreEfficient: boolean;
-  compact?: boolean;
-  reserveChargeSpace?: boolean;
 }) {
   const gauge = Math.min(100, Math.max(0, estimate.endBatteryPct));
   const status = estimate.arrivalStatus;
@@ -226,32 +220,40 @@ function OutlookCard({
   const rangeImpactLabel = rangeImpact === 0
     ? "Matches rating"
     : `${Math.abs(rangeImpact)} mi ${rangeImpact > 0 ? "more" : "less"}`;
+  const verdict = status === "ready"
+    ? "This trip fits comfortably."
+    : status === "low"
+      ? "This trip needs a charging plan."
+      : "Add a charging stop.";
 
   return (
     <article
-      className={`outlook-card${compact ? " compact" : ""}${moreEfficient ? " is-efficient" : ""}`}
+      className="outlook-card"
       style={{ "--car-accent": car.accent } as CSSProperties}
       aria-label={`${car.shortName} trip outlook`}
     >
       <div className="result-top">
-        <div className="outlook-identity">
-          <span className="outlook-car-line">
-            <BrandLogo make={car.make} />
-            <span className="outlook-car-copy">
-              <span className="outlook-car">{car.shortName}</span>
-              <small>{car.modelYear} · {car.rangeBasis} {car.statedRangeMi} mi</small>
-            </span>
+        <span className="outlook-car-line">
+          <BrandLogo make={car.make} />
+          <span className="outlook-car-copy">
+            <span className="outlook-car">{car.shortName}</span>
+            <small>{car.modelYear} · {car.rangeBasis} {car.statedRangeMi} mi</small>
           </span>
-          {moreEfficient ? <span className="efficient-badge">More efficient</span> : null}
-        </div>
-        {!compact && status !== "ready" ? (
+        </span>
+        {status !== "ready" ? (
           <span className={`status ${statusClass(status)}`} role="status">
             {getArrivalStatusLabel(status)}
           </span>
         ) : null}
       </div>
 
-      <VehiclePhoto car={car} compact={compact} />
+      <div className={`trip-verdict tone-${status}`}>
+        <span>Trip verdict</span>
+        <h3>{verdict}</h3>
+        <p>{tip}</p>
+      </div>
+
+      <VehiclePhoto car={car} />
 
       <div className="range-story" aria-label={`${car.statedRangeMi} miles stated range becomes about ${conditionsRange} miles in your selected conditions`}>
         <span>
@@ -266,20 +268,12 @@ function OutlookCard({
         <em className={rangeImpact < 0 ? "negative" : rangeImpact > 0 ? "positive" : "neutral"}>{rangeImpactLabel}</em>
       </div>
 
-      <div
-        className="battery-visual"
-        aria-label={`Estimated arrival battery ${Math.round(estimate.endBatteryPct)} percent`}
-        style={{ "--gauge-angle": `${gauge * 3.6}deg` } as CSSProperties}
-      >
-        <div className={`energy-core tone-${status}`} aria-hidden="true" />
-        <div className="battery-copy">
-          <small>ARRIVAL ENERGY</small>
-          <strong>
-            {Math.round(estimate.endBatteryPct)}
-            <sup>%</sup>
-          </strong>
-          <span>after {distance} miles</span>
+      <div className={`energy-summary tone-${status}`} aria-label={`Estimated arrival battery ${Math.round(estimate.endBatteryPct)} percent`}>
+        <div className="energy-heading">
+          <span><small>Estimated arrival</small><strong>{Math.round(estimate.endBatteryPct)}<sup>%</sup></strong></span>
+          <span><small>After</small><strong>{distance} mi</strong></span>
         </div>
+        <div className="energy-track" aria-hidden="true"><span style={{ width: `${gauge}%` }} /></div>
       </div>
 
       <div className="metrics beginner-metrics">
@@ -291,25 +285,87 @@ function OutlookCard({
           <small>Starting charge</small>
           <strong>{startBattery}%</strong>
         </div>
+        <div>
+          <small>Energy use</small>
+          <strong>{estimate.whPerMi} Wh/mi</strong>
+        </div>
       </div>
 
-      <div className={`charge-tip-slot${reserveChargeSpace ? " reserved" : ""}`}>
-        {charge ? (
-          <div className="charge-tip" role="note">
-            <span>Fast Charge</span>
-            <p>
-              Add ~{charge.kwhNeeded.toFixed(1)} kWh (~{charge.minutes} min) to arrive near a{" "}
-              {charge.targetBufferPct}% buffer.
-            </p>
-          </div>
-        ) : null}
-      </div>
-
-      <div className={`tip-card tone-${status}`}>
-        <span>GOOD TO KNOW</span>
-        <p>{tip}</p>
-      </div>
+      {charge ? (
+        <div className="charge-tip" role="note">
+          <span>Recommended fast charge</span>
+          <p>Add ~{charge.kwhNeeded.toFixed(1)} kWh—or about {charge.minutes} minutes—to arrive near {charge.targetBufferPct}%.</p>
+        </div>
+      ) : null}
     </article>
+  );
+}
+
+function CompareResults({
+  first,
+  second,
+  firstEstimate,
+  secondEstimate,
+  efficientId,
+  firstTip,
+  secondTip,
+}: {
+  first: EvCar;
+  second: EvCar;
+  firstEstimate: TripEstimate;
+  secondEstimate: TripEstimate;
+  efficientId: string | null;
+  firstTip: string;
+  secondTip: string;
+}) {
+  const firstRange = Math.max(0, Math.round((first.usableBatteryKwh * 1000) / firstEstimate.whPerMi));
+  const secondRange = Math.max(0, Math.round((second.usableBatteryKwh * 1000) / secondEstimate.whPerMi));
+  const batteryGap = Math.round(Math.abs(firstEstimate.endBatteryPct - secondEstimate.endBatteryPct));
+  const leader = firstEstimate.endBatteryPct === secondEstimate.endBatteryPct
+    ? null
+    : firstEstimate.endBatteryPct > secondEstimate.endBatteryPct ? first : second;
+
+  const rows = [
+    { label: "Stated range", first: `${first.statedRangeMi} mi`, second: `${second.statedRangeMi} mi` },
+    { label: "Your conditions", first: `~${firstRange} mi`, second: `~${secondRange} mi` },
+    { label: "Arrival battery", first: `${Math.round(firstEstimate.endBatteryPct)}%`, second: `${Math.round(secondEstimate.endBatteryPct)}%` },
+    { label: "Range left", first: `~${Math.round(firstEstimate.remainingRangeMi)} mi`, second: `~${Math.round(secondEstimate.remainingRangeMi)} mi` },
+    { label: "Efficiency", first: `${firstEstimate.whPerMi} Wh/mi`, second: `${secondEstimate.whPerMi} Wh/mi` },
+  ];
+
+  return (
+    <section className="compare-result" aria-label={`${first.shortName} and ${second.shortName} comparison`}>
+      <div className="compare-result-heading">
+        <span>Side by side</span>
+        <h2>One trip. Two clear outcomes.</h2>
+        <p>{leader ? `${leader.shortName} arrives with ${batteryGap}% more battery on this trip.` : "Both vehicles arrive with the same battery level on this trip."}</p>
+      </div>
+      <div className="compare-vehicle-grid">
+        {[first, second].map((item) => (
+          <article key={item.id} className="compare-vehicle" style={{ "--car-accent": item.accent } as CSSProperties}>
+            <span className="outlook-car-line">
+              <BrandLogo make={item.make} />
+              <span className="outlook-car-copy"><span className="outlook-car">{item.shortName}</span><small>{item.modelYear} · {item.make}</small></span>
+            </span>
+            <VehiclePhoto car={item} compact />
+            {efficientId === item.id ? <span className="efficient-badge">More efficient</span> : null}
+          </article>
+        ))}
+      </div>
+      <div className="comparison-table" role="table" aria-label="Vehicle comparison metrics">
+        {rows.map((row) => (
+          <div className="comparison-row" role="row" key={row.label}>
+            <strong role="rowheader">{row.label}</strong>
+            <span role="cell">{row.first}</span>
+            <span role="cell">{row.second}</span>
+          </div>
+        ))}
+      </div>
+      <div className="compare-guidance">
+        <p><strong>{first.shortName}:</strong> {firstTip}</p>
+        <p><strong>{second.shortName}:</strong> {secondTip}</p>
+      </div>
+    </section>
   );
 }
 
@@ -387,6 +443,12 @@ function PhevResults({ car, result, dailyMiles, longTripsPerMonth }: { car: Phev
         <span className="phev-fit-badge">{fitLabel}</span>
       </div>
 
+      <div className={`phev-verdict ${result.routineFitsElectric ? "fits" : "mixed"}`}>
+        <span>Daily-drive verdict</span>
+        <h2>{result.routineFitsElectric ? "Your routine fits on electricity." : "Gas joins your daily drive."}</h2>
+        <p>{routineCopy}</p>
+      </div>
+
       <div className="phev-share" aria-label={`${result.electricSharePct} percent of projected monthly miles on electricity`}>
         <small>PROJECTED ELECTRIC SHARE</small>
         <strong>{result.electricSharePct}<sup>%</sup></strong>
@@ -406,8 +468,7 @@ function PhevResults({ car, result, dailyMiles, longTripsPerMonth }: { car: Phev
       </div>
 
       <div className={`tip-card ${result.routineFitsElectric ? "tone-ready" : "tone-low"}`}>
-        <span>WHAT THIS MEANS</span>
-        <p>{routineCopy}</p>
+        <span>LONG-TRIP BACKUP</span>
         <p>{backupCopy}</p>
       </div>
 
@@ -471,24 +532,13 @@ function Hero() {
           Explore the models, compare the tradeoffs, and test how your trips, weather, speed, passengers, and landscape
           change real-world range—before you choose.
         </p>
-        <ul className="hero-stats">
-          <li><strong>{cars.length}</strong><span>EVs to explore</span></li>
-          <li><strong>3</strong><span>ways to learn</span></li>
-          <li><strong>Live</strong><span>range simulator</span></li>
-        </ul>
+        <a className="hero-action" href="#lab">Enter the lab <span aria-hidden="true">↓</span></a>
       </div>
       <div className="hero-stage" aria-hidden="true">
-        <figure className="hero-photo back">
-          <Image src="/vehicles/ioniq-5.jpg" alt="" fill sizes="(max-width: 860px) 90vw, 420px" unoptimized />
-        </figure>
         <figure className="hero-photo main">
           <Image src="/vehicles/model-3-lr.jpg" alt="" fill sizes="(max-width: 860px) 92vw, 480px" unoptimized />
         </figure>
-        <div className="hero-float soc">
-          <small>In the lab</small>
-          <strong>{cars.length} EVs</strong>
-        </div>
-        <div className="hero-float chip">Learn · Compare · Choose</div>
+        <div className="hero-caption"><span>{cars.length} EVs · {phevCars.length} PHEVs</span><strong>Real conditions. Honest range.</strong></div>
       </div>
     </section>
   );
@@ -497,12 +547,12 @@ function Hero() {
 function ShoppingResults({ matches, onCompare }: { matches: ShopMatch[]; onCompare: (first: EvCar, second: EvCar) => void }) {
   return (
     <div className="shop-results">
-      <div className="shop-results-heading"><span>YOUR BEST MATCHES</span><h2>Three EVs worth a closer look.</h2><p>Ranked for your needs and the conditions selected on this page.</p></div>
+      <div className="shop-results-heading"><span>YOUR BEST MATCHES</span><h2>Your strongest matches.</h2><p>Ranked for your needs and the conditions selected on this page.</p></div>
       <div className="shop-match-list">
         {matches.map((match, index) => {
           const spec = getShopSpec(match.car);
           return (
-            <article className="shop-match" key={match.car.id} style={{ "--car-accent": match.car.accent } as CSSProperties}>
+            <article className={`shop-match${index === 0 ? " is-primary" : ""}`} key={match.car.id} style={{ "--car-accent": match.car.accent } as CSSProperties}>
               <div className="shop-rank">0{index + 1}</div>
               <VehiclePhoto car={match.car} compact />
               <div className="shop-match-title"><BrandLogo make={match.car.make} /><div><small>{match.car.modelYear} · {match.car.make}</small><h3>{match.car.shortName}</h3></div><strong>{match.score}% fit</strong></div>
@@ -578,7 +628,6 @@ export default function Home() {
   const tip = getPlainTip(inputs, result, viewMode === "compare" ? car.shortName : undefined);
   const tipB = getPlainTip(inputs, resultB, carB.shortName);
   const charge = getChargeRecommendation(car, result);
-  const chargeB = getChargeRecommendation(carB, resultB);
   const activeRoute = matchRoutePreset(inputs);
   const activeGeo = matchGeoPreset(inputs);
 
@@ -668,7 +717,7 @@ export default function Home() {
 
       <Hero />
 
-      <section className="lab-shell" aria-label="EV range calculator" data-mode={viewMode}>
+      <section id="lab" className="lab-shell" aria-label="EV range calculator" data-mode={viewMode}>
         <div className="controls-panel">
           {viewMode === "phev" ? (
             <PhevControls
@@ -712,12 +761,6 @@ export default function Home() {
             </div>
           )}
 
-          {viewMode === "shop" ? (
-            <div className="mobile-shopping-results">
-              <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
-            </div>
-          ) : null}
-
           <div className="section-heading compact">
             <span>02</span>
             <div>
@@ -733,14 +776,12 @@ export default function Home() {
             </div>
           </section>
 
-          <div className="section-heading compact conditions-heading">
-            <span>03</span>
-            <div>
-              <p>Fine-tune the estimate</p>
-              <h2>Driving conditions</h2>
-            </div>
-          </div>
-
+          <details className="conditions-disclosure">
+            <summary>
+              <span className="summary-index">03</span>
+              <span><small>Fine-tune the estimate</small><strong>Driving conditions</strong></span>
+              <em>{temperature}°F · {speed} mph · {geoPresets.find((item) => item.id === activeGeo)?.label ?? "Custom"}</em>
+            </summary>
           <section className="control-group conditions-group" aria-label="Driving conditions">
             <div className="preset-block">
               <p className="preset-label">Scenario shortcuts</p>
@@ -804,6 +845,7 @@ export default function Home() {
 
             <RangeControl label="Passengers + cargo" help="More people and luggage add weight. The effect is usually smaller than speed or temperature." value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
           </section>
+          </details>
           </>
           )}
         </div>
@@ -815,9 +857,18 @@ export default function Home() {
             <div className="desktop-shopping-results">
               <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
             </div>
+          ) : viewMode === "compare" ? (
+            <CompareResults
+              first={car}
+              second={carB}
+              firstEstimate={result}
+              secondEstimate={resultB}
+              efficientId={winnerId}
+              firstTip={tip}
+              secondTip={tipB}
+            />
           ) : (
-          <>
-          <div className={`outlook-stack${viewMode === "compare" ? " dual" : ""}`}>
+          <div className="outlook-stack">
             <OutlookCard
               car={car}
               estimate={result}
@@ -825,26 +876,8 @@ export default function Home() {
               startBattery={battery}
               tip={tip}
               charge={charge}
-              moreEfficient={winnerId === car.id}
-              compact={viewMode === "compare"}
-              reserveChargeSpace={viewMode === "compare" && Boolean(charge || chargeB)}
             />
-            {viewMode === "compare" ? (
-              <OutlookCard
-                car={carB}
-                estimate={resultB}
-                distance={distance}
-                startBattery={battery}
-                tip={tipB}
-                charge={chargeB}
-                moreEfficient={winnerId === carB.id}
-                compact
-                reserveChargeSpace={Boolean(charge || chargeB)}
-              />
-            ) : null}
           </div>
-
-          </>
           )}
         </aside>
       </section>
