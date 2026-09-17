@@ -144,7 +144,7 @@ function BrandLogo({ make, className = "" }: { make: string; className?: string 
   const logo = getBrandLogo(make);
   return (
     <span className={`brand-logo-badge ${logo.shape} ${className}`.trim()} aria-hidden="true">
-      <img className="brand-logo" src={`/brands/${logo.slug}.svg`} alt="" />
+      <img className="brand-logo" src={`/brands/${logo.slug}.svg?v=3`} alt="" />
     </span>
   );
 }

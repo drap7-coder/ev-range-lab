@@ -27,7 +27,7 @@ test("server-renders EV Range Lab without starter metadata", async () => {
   assert.match(html, /Learn · Compare · Choose/);
   assert.match(html, /\/brand\/ev-mark-wide\.png/);
   assert.match(html, /\/icons\/favicon-32-v6\.png/);
-  assert.match(html, /\/brands\/tesla\.svg/);
+  assert.match(html, /\/brands\/tesla\.svg\?v=3/);
   assert.match(html, /Stated range/);
   assert.doesNotMatch(html, /Stops needed|Easy Drive|No stops needed/);
   assert.match(normalizedHtml, /2026 Tesla Model 3 Long Range AWD — 346 mi stated/);
