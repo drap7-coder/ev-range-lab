@@ -27,8 +27,10 @@ import {
   type GeoPresetId,
   type RoutePresetId,
 } from "@/lib/ev/presets";
+import { DEFAULT_PHEV, phevCars, type PhevCar } from "@/lib/phev/cars";
+import { estimatePhevLifestyle, type PhevLifestyleResult } from "@/lib/phev/model";
 
-type ViewMode = "single" | "compare" | "shop";
+type ViewMode = "single" | "compare" | "shop" | "phev";
 type ShopBody = "any" | EvCar["bodyStyle"];
 type ShopPriority = "balanced" | "range" | "value" | "charging";
 type ShopMatch = { car: EvCar; score: number; realRange: number; reason: string };
@@ -146,6 +148,31 @@ function BrandLogo({ make, className = "" }: { make: string; className?: string 
     <span className={`brand-logo-badge ${logo.shape} ${className}`.trim()} aria-hidden="true">
       <img className="brand-logo" src={`/brands/${logo.slug}.svg?v=3`} alt="" />
     </span>
+  );
+}
+
+function PhevPicker({ car, onChange }: { car: PhevCar; onChange: (id: string) => void }) {
+  return (
+    <div className="vehicle-picker phev-picker">
+      <label className="select-label" htmlFor="phev-vehicle">
+        Plug-in hybrid
+        <select id="phev-vehicle" value={car.id} onChange={(event) => onChange(event.target.value)}>
+          {phevCars.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.modelYear} {item.name} — {item.electricRangeMi} mi electric
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className="vehicle-card-heading" style={{ "--car-accent": car.accent } as CSSProperties}>
+        <BrandLogo make={car.make} className="picker-brand" />
+        <span><small>{car.modelYear} · {car.make}</small><strong>{car.shortName}</strong></span>
+      </div>
+      <div className="car-specs">
+        <span><small>Electric range · {car.rangeBasis}</small><strong>{car.electricRangeMi} mi</strong></span>
+        <span><small>Seats</small><strong>{car.seats}</strong></span>
+      </div>
+    </div>
   );
 }
 
@@ -286,6 +313,110 @@ function OutlookCard({
   );
 }
 
+function PhevControls({
+  car,
+  onCarChange,
+  dailyMiles,
+  daysPerWeek,
+  longTripMiles,
+  longTripsPerMonth,
+  onDailyMiles,
+  onDaysPerWeek,
+  onLongTripMiles,
+  onLongTripsPerMonth,
+}: {
+  car: PhevCar;
+  onCarChange: (id: string) => void;
+  dailyMiles: number;
+  daysPerWeek: number;
+  longTripMiles: number;
+  longTripsPerMonth: number;
+  onDailyMiles: (value: number) => void;
+  onDaysPerWeek: (value: number) => void;
+  onLongTripMiles: (value: number) => void;
+  onLongTripsPerMonth: (value: number) => void;
+}) {
+  return (
+    <>
+      <div className="section-heading">
+        <span>01</span>
+        <div><p>Choose a plug-in hybrid</p><h2>{car.shortName}</h2></div>
+      </div>
+      <PhevPicker car={car} onChange={onCarChange} />
+
+      <div className="section-heading compact">
+        <span>02</span>
+        <div><p>Map your routine</p><h2>Your PHEV life</h2></div>
+      </div>
+      <section className="control-group trip-group phev-routine" aria-label="Your plug-in hybrid routine">
+        <div className="trip-grid">
+          <RangeControl label="Daily round trip" help="Your normal total mileage before the vehicle can charge again overnight." value={dailyMiles} min={5} max={100} step={5} unit=" mi" onChange={onDailyMiles} />
+          <RangeControl label="Driving days" help="How many days each week you expect to make this regular trip." value={daysPerWeek} min={1} max={7} unit=" /wk" onChange={onDaysPerWeek} />
+          <RangeControl label="Typical long trip" help="The distance of a longer drive where the gasoline engine becomes useful after the battery is depleted." value={longTripMiles} min={50} max={500} step={25} unit=" mi" onChange={onLongTripMiles} />
+          <RangeControl label="Long trips" help="How often you make that longer trip in a typical month." value={longTripsPerMonth} min={0} max={4} unit=" /mo" onChange={onLongTripsPerMonth} />
+        </div>
+        <p className="phev-assumption"><strong>Lab assumption:</strong> You plug in overnight and start each driving day with a full battery.</p>
+      </section>
+    </>
+  );
+}
+
+function PhevResults({ car, result, dailyMiles, longTripsPerMonth }: { car: PhevCar; result: PhevLifestyleResult; dailyMiles: number; longTripsPerMonth: number }) {
+  const fitLabel = result.electricSharePct >= 80
+    ? "Electric-first fit"
+    : result.electricSharePct >= 55
+      ? "Balanced PHEV fit"
+      : "Gas will stay busy";
+  const routineCopy = result.routineFitsElectric
+    ? `Your ${dailyMiles}-mile routine fits inside this PHEV's battery range.`
+    : `The battery covers the first ${result.dailyElectricMiles} miles; gas backs up the remaining ${result.dailyGasMiles} miles.`;
+  const backupCopy = longTripsPerMonth > 0
+    ? `${longTripsPerMonth} longer ${longTripsPerMonth === 1 ? "trip" : "trips"} each month can continue after the battery is depleted—without planning a charging stop.`
+    : "Your current routine does not include a regular long trip, so a full EV may also be worth comparing.";
+
+  return (
+    <article className="phev-results-card" style={{ "--car-accent": car.accent } as CSSProperties} aria-label={`${car.shortName} plug-in hybrid lifestyle outlook`}>
+      <div className="phev-result-head">
+        <span className="outlook-car-line">
+          <BrandLogo make={car.make} />
+          <span className="outlook-car-copy">
+            <span className="outlook-car">{car.shortName}</span>
+            <small>{car.modelYear} · {car.rangeBasis} {car.electricRangeMi} mi electric</small>
+          </span>
+        </span>
+        <span className="phev-fit-badge">{fitLabel}</span>
+      </div>
+
+      <div className="phev-share" aria-label={`${result.electricSharePct} percent of projected monthly miles on electricity`}>
+        <small>PROJECTED ELECTRIC SHARE</small>
+        <strong>{result.electricSharePct}<sup>%</sup></strong>
+        <div className="phev-share-track" aria-hidden="true"><span style={{ width: `${result.electricSharePct}%` }} /></div>
+        <p>of your routine and longer-trip miles could start on battery power.</p>
+      </div>
+
+      <div className="phev-mile-split">
+        <div><small>Electric miles / month</small><strong>~{result.electricMiles}</strong></div>
+        <div><small>Gas-backed miles / month</small><strong>~{result.gasBackedMiles}</strong></div>
+      </div>
+
+      <div className="phev-daily-story">
+        <span><small>Daily drive</small><strong>{dailyMiles} mi</strong></span>
+        <b aria-hidden="true">→</b>
+        <span><small>Electric window</small><strong>{car.electricRangeMi} mi</strong></span>
+      </div>
+
+      <div className={`tip-card ${result.routineFitsElectric ? "tone-ready" : "tone-low"}`}>
+        <span>WHAT THIS MEANS</span>
+        <p>{routineCopy}</p>
+        <p>{backupCopy}</p>
+      </div>
+
+      <a className="phev-source" href={car.sourceUrl} target="_blank" rel="noreferrer">Verify {car.modelYear} range with {car.make} ↗</a>
+      <p className="phev-disclaimer">Lifestyle projection uses the listed EPA electric range and assumes a full overnight charge. Weather, speed, battery condition, and trim can reduce real electric range.</p>
+    </article>
+  );
+}
+
 function ShoppingProfile({
   budget,
   body,
@@ -409,9 +540,24 @@ export default function Home() {
   const [shopBody, setShopBody] = useState<ShopBody>("any");
   const [shopSeats, setShopSeats] = useState(5);
   const [shopPriority, setShopPriority] = useState<ShopPriority>("balanced");
+  const [phevId, setPhevId] = useState(DEFAULT_PHEV.id);
+  const [phevDailyMiles, setPhevDailyMiles] = useState(30);
+  const [phevDaysPerWeek, setPhevDaysPerWeek] = useState(5);
+  const [phevLongTripMiles, setPhevLongTripMiles] = useState(250);
+  const [phevLongTripsPerMonth, setPhevLongTripsPerMonth] = useState(1);
 
   const car = cars.find((item) => item.id === carId) ?? DEFAULT_CAR;
   const carB = cars.find((item) => item.id === carIdB) ?? cars[1] ?? DEFAULT_CAR;
+  const phev = phevCars.find((item) => item.id === phevId) ?? DEFAULT_PHEV;
+  const phevResult = useMemo(
+    () => estimatePhevLifestyle(phev, {
+      dailyMiles: phevDailyMiles,
+      daysPerWeek: phevDaysPerWeek,
+      longTripMiles: phevLongTripMiles,
+      longTripsPerMonth: phevLongTripsPerMonth,
+    }),
+    [phev, phevDailyMiles, phevDaysPerWeek, phevLongTripMiles, phevLongTripsPerMonth],
+  );
 
   const inputs: TripInputs = useMemo(
     () => ({
@@ -515,6 +661,7 @@ export default function Home() {
               Compare
             </button>
             <button type="button" className={viewMode === "shop" ? "active" : ""} aria-pressed={viewMode === "shop"} onClick={() => setViewMode("shop")}>Shop</button>
+            <button type="button" className={viewMode === "phev" ? "active" : ""} aria-pressed={viewMode === "phev"} onClick={() => setViewMode("phev")}>PHEV</button>
           </div>
         </div>
       </header>
@@ -523,6 +670,21 @@ export default function Home() {
 
       <section className="lab-shell" aria-label="EV range calculator" data-mode={viewMode}>
         <div className="controls-panel">
+          {viewMode === "phev" ? (
+            <PhevControls
+              car={phev}
+              onCarChange={setPhevId}
+              dailyMiles={phevDailyMiles}
+              daysPerWeek={phevDaysPerWeek}
+              longTripMiles={phevLongTripMiles}
+              longTripsPerMonth={phevLongTripsPerMonth}
+              onDailyMiles={setPhevDailyMiles}
+              onDaysPerWeek={setPhevDaysPerWeek}
+              onLongTripMiles={setPhevLongTripMiles}
+              onLongTripsPerMonth={setPhevLongTripsPerMonth}
+            />
+          ) : (
+          <>
           <div className="section-heading">
             <span>01</span>
             <div>
@@ -642,10 +804,14 @@ export default function Home() {
 
             <RangeControl label="Passengers + cargo" help="More people and luggage add weight. The effect is usually smaller than speed or temperature." value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
           </section>
+          </>
+          )}
         </div>
 
-        <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}${viewMode === "shop" ? " shopping" : ""}`}>
-          {viewMode === "shop" ? (
+        <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}${viewMode === "shop" ? " shopping" : ""}${viewMode === "phev" ? " phev" : ""}`}>
+          {viewMode === "phev" ? (
+            <PhevResults car={phev} result={phevResult} dailyMiles={phevDailyMiles} longTripsPerMonth={phevLongTripsPerMonth} />
+          ) : viewMode === "shop" ? (
             <div className="desktop-shopping-results">
               <ShoppingResults matches={shopMatches} onCompare={(first, second) => { setCarId(first.id); setCarIdB(second.id); setViewMode("compare"); }} />
             </div>
@@ -686,25 +852,25 @@ export default function Home() {
       <section className="how-it-works">
         <div className="explain-heading">
           <div>
-            <p className="eyebrow">What changes range?</p>
-            <h2>Three inputs matter most.</h2>
+            <p className="eyebrow">{viewMode === "phev" ? "How a PHEV works" : "What changes range?"}</p>
+            <h2>{viewMode === "phev" ? "Battery first. Gas when you need it." : "Three inputs matter most."}</h2>
           </div>
         </div>
-        <div className="explain-grid" role="list" aria-label="The three biggest forces affecting EV range">
+        <div className="explain-grid" role="list" aria-label={viewMode === "phev" ? "How a plug-in hybrid fits everyday driving" : "The three biggest forces affecting EV range"}>
           <article role="listitem">
             <span>01</span>
-            <h3>Air gets expensive</h3>
-            <p>At highway speed, pushing air aside takes much more energy. Slowing down is often your most powerful lever.</p>
+            <h3>{viewMode === "phev" ? "Plug in nightly" : "Air gets expensive"}</h3>
+            <p>{viewMode === "phev" ? "A PHEV delivers its biggest benefit when the smaller battery starts each day full. A standard household outlet is often enough overnight." : "At highway speed, pushing air aside takes much more energy. Slowing down is often your most powerful lever."}</p>
           </article>
           <article role="listitem">
             <span>02</span>
-            <h3>Temperature matters</h3>
-            <p>Cold batteries deliver less energy, while cabin heat adds demand. Preconditioning while plugged in helps.</p>
+            <h3>{viewMode === "phev" ? "Drive electric first" : "Temperature matters"}</h3>
+            <p>{viewMode === "phev" ? "If your routine fits inside the electric range, most ordinary days can feel like owning an EV—with the engine waiting in reserve." : "Cold batteries deliver less energy, while cabin heat adds demand. Preconditioning while plugged in helps."}</p>
           </article>
           <article role="listitem">
             <span>03</span>
-            <h3>Elevation collects a toll</h3>
-            <p>Climbing costs energy. Regeneration gives some back downhill, but never all of it—Mountain pass makes that vivid.</p>
+            <h3>{viewMode === "phev" ? "Keep gas backup" : "Elevation collects a toll"}</h3>
+            <p>{viewMode === "phev" ? "After the battery is depleted, the hybrid system keeps going on gasoline. That flexibility is the reason to choose a PHEV over a full EV." : "Climbing costs energy. Regeneration gives some back downhill, but never all of it—Mountain pass makes that vivid."}</p>
           </article>
         </div>
       </section>
@@ -712,7 +878,7 @@ export default function Home() {
       <footer>
         <strong><EvBrandMark />EV Range Lab</strong>
         <p>
-          Stated range is the listed EPA or manufacturer estimate for the model year and trim. EV Range Lab results are educational,
+          Stated range is the listed EPA or manufacturer estimate for the model year and trim. EV and PHEV results are educational,
           not an OEM warranty range; actual range varies with battery health, weather, traffic, tires, and driving style.
         </p>
       </footer>
