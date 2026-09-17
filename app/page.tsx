@@ -559,74 +559,89 @@ export default function Home() {
           <div className="section-heading compact">
             <span>02</span>
             <div>
-              <p>Shape the trip</p>
-              <h2>Conditions</h2>
+              <p>Plan the drive</p>
+              <h2>Your trip</h2>
             </div>
           </div>
 
-          <div className="preset-block">
-            <p className="preset-label">Route shortcuts</p>
-            <div className="preset-row" role="group" aria-label="Route presets">
-              {routePresets.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  className={activeRoute === preset.id ? "active" : ""}
-                  aria-pressed={activeRoute === preset.id}
-                  title={preset.hint}
-                  onClick={() => onRoutePreset(preset.id)}
-                >
-                  {preset.label}
-                </button>
-              ))}
+          <section className="control-group trip-group" aria-label="Your trip">
+            <div className="trip-grid">
+              <RangeControl label="Trip distance" help="How far you plan to drive before reaching your destination or next charger." value={distance} min={5} max={400} step={5} unit=" mi" onChange={setDistance} />
+              <RangeControl label="Starting battery" help="Think of this like the fuel gauge when you leave. Most EV owners charge at home overnight." value={battery} min={10} max={100} step={5} unit="%" onChange={setBattery} />
+            </div>
+          </section>
+
+          <div className="section-heading compact conditions-heading">
+            <span>03</span>
+            <div>
+              <p>Fine-tune the estimate</p>
+              <h2>Driving conditions</h2>
             </div>
           </div>
 
-          <RangeControl label="Trip distance" help="How far you plan to drive before reaching your destination or next charger." value={distance} min={5} max={400} step={5} unit=" mi" onChange={setDistance} />
-          <RangeControl label="Starting battery" help="Think of this like the fuel gauge when you leave. Most EV owners charge at home overnight." value={battery} min={10} max={100} step={5} unit="%" onChange={setBattery} />
-          <RangeControl
-            label="Outside temperature"
-            help="Cold slows the battery's chemistry and cabin heat uses extra energy. Preheating while plugged in helps."
-            value={temperature}
-            min={-10}
-            max={110}
-            step={5}
-            unit="°F"
-            onChange={setTemperature}
-          />
-          <RangeControl label="Average speed" help="Driving faster pushes much more air out of the way. Highway speed usually reduces range the most." value={speed} min={20} max={85} unit=" mph" onChange={setSpeed} />
-
-          <label className="select-label climate-field" htmlFor="climate">
-            Cabin climate
-            <select id="climate" value={climate} onChange={(event) => setClimate(event.target.value as Climate)}>
-              <option value="off">Off</option>
-              <option value="eco">Eco</option>
-              <option value="normal">Normal</option>
-              <option value="max">Maximum</option>
-            </select>
-          </label>
-
-          <div className="preset-block geo">
-            <p className="preset-label">Landscape</p>
-            <div className="geo-row" role="radiogroup" aria-label="Landscape">
-              {geoPresets.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={activeGeo === preset.id}
-                  className={`landscape-card ${preset.id}${activeGeo === preset.id ? " active" : ""}`}
-                  onClick={() => onGeoPreset(preset.id)}
-                >
-                  <span className="landscape-shape" aria-hidden="true" />
-                  <strong>{preset.label}</strong>
-                  <span>{preset.hint}</span>
-                </button>
-              ))}
+          <section className="control-group conditions-group" aria-label="Driving conditions">
+            <div className="preset-block">
+              <p className="preset-label">Scenario shortcuts</p>
+              <div className="preset-row" role="group" aria-label="Route presets">
+                {routePresets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className={activeRoute === preset.id ? "active" : ""}
+                    aria-pressed={activeRoute === preset.id}
+                    title={preset.hint}
+                    onClick={() => onRoutePreset(preset.id)}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <RangeControl label="Passengers + cargo" help="More people and luggage add weight. The effect is usually smaller than speed or temperature." value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
+            <RangeControl
+              label="Outside temperature"
+              help="Cold slows the battery's chemistry and cabin heat uses extra energy. Preheating while plugged in helps."
+              value={temperature}
+              min={-10}
+              max={110}
+              step={5}
+              unit="°F"
+              onChange={setTemperature}
+            />
+            <RangeControl label="Average speed" help="Driving faster pushes much more air out of the way. Highway speed usually reduces range the most." value={speed} min={20} max={85} unit=" mph" onChange={setSpeed} />
+
+            <label className="select-label climate-field" htmlFor="climate">
+              Cabin climate
+              <select id="climate" value={climate} onChange={(event) => setClimate(event.target.value as Climate)}>
+                <option value="off">Off</option>
+                <option value="eco">Eco</option>
+                <option value="normal">Normal</option>
+                <option value="max">Maximum</option>
+              </select>
+            </label>
+
+            <div className="preset-block geo">
+              <p className="preset-label">Landscape</p>
+              <div className="geo-row" role="radiogroup" aria-label="Landscape">
+                {geoPresets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={activeGeo === preset.id}
+                    className={`landscape-card ${preset.id}${activeGeo === preset.id ? " active" : ""}`}
+                    onClick={() => onGeoPreset(preset.id)}
+                  >
+                    <span className="landscape-shape" aria-hidden="true" />
+                    <strong>{preset.label}</strong>
+                    <span>{preset.hint}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <RangeControl label="Passengers + cargo" help="More people and luggage add weight. The effect is usually smaller than speed or temperature." value={load} min={0} max={1000} step={50} unit=" lb" onChange={setLoad} />
+          </section>
         </div>
 
         <aside className={`results-panel${viewMode === "compare" ? " compare" : ""}${viewMode === "shop" ? " shopping" : ""}`}>

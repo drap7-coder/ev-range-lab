@@ -34,6 +34,9 @@ test("server-renders EV Range Lab without starter metadata", async () => {
   assert.match(html, /Your conditions/);
   assert.match(html, /not an OEM warranty range/);
   assert.match(html, /Landscape/);
+  assert.match(html, /Your trip/);
+  assert.match(html, /Driving conditions/);
+  assert.match(html, /Scenario shortcuts/);
   assert.doesNotMatch(html, /Home charging|Net elevation|id="terrain"/);
   assert.doesNotMatch(html, /Gas tank equivalent|GAS VS\. EV/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
