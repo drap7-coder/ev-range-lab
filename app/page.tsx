@@ -217,7 +217,7 @@ function OutlookCard({
           </span>
           {moreEfficient ? <span className="efficient-badge">More efficient</span> : null}
         </div>
-        {status !== "ready" ? (
+        {!compact && status !== "ready" ? (
           <span className={`status ${statusClass(status)}`} role="status">
             {getArrivalStatusLabel(status)}
           </span>
