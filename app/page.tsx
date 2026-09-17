@@ -443,6 +443,21 @@ function PhevResults({ car, result, dailyMiles, longTripsPerMonth }: { car: Phev
         <span className="phev-fit-badge">{fitLabel}</span>
       </div>
 
+      <figure className="vehicle-photo phev-photo">
+        <Image
+          className="vehicle-image"
+          src={`/phevs/${car.id}.jpg`}
+          alt={`${car.name} exterior`}
+          fill
+          sizes="(max-width: 860px) 92vw, 520px"
+          unoptimized
+        />
+        <figcaption>
+          <span className="photo-brand"><BrandLogo make={car.make} className="photo-brand-mark" /><strong>{car.make}</strong></span>
+          <a href={car.photoSourceUrl} target="_blank" rel="noreferrer" aria-label={`View ${car.name} photo source on Wikimedia Commons`}>Photo: Commons ↗</a>
+        </figcaption>
+      </figure>
+
       <div className={`phev-verdict ${result.routineFitsElectric ? "fits" : "mixed"}`}>
         <span>Daily-drive verdict</span>
         <h2>{result.routineFitsElectric ? "Your routine fits on electricity." : "Gas joins your daily drive."}</h2>

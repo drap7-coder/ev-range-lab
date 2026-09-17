@@ -10,6 +10,7 @@ export type PhevCar = {
   rangeBasis: "EPA est.";
   accent: string;
   sourceUrl: string;
+  photoSourceUrl: string;
 };
 
 export const phevCars: PhevCar[] = [
@@ -25,6 +26,7 @@ export const phevCars: PhevCar[] = [
     rangeBasis: "EPA est.",
     accent: "#fbbf24",
     sourceUrl: "https://www.ford.com/suvs-crossovers/escape/",
+    photoSourceUrl: "https://commons.wikimedia.org/wiki/File:2023_Ford_Escape_Plug-In_Hybrid,_front_NYIAS_2023.jpg",
   },
   {
     id: "gle-450e",
@@ -38,6 +40,7 @@ export const phevCars: PhevCar[] = [
     rangeBasis: "EPA est.",
     accent: "#a5b4fc",
     sourceUrl: "https://www.mbusa.com/en/vehicles/model/gle/suv/gle450e4",
+    photoSourceUrl: "https://commons.wikimedia.org/wiki/File:Mercedes-Benz_GLE_350_de_4MATIC_(V167,_2024)_(54732467967).jpg",
   },
   {
     id: "x5-xdrive50e",
@@ -51,6 +54,7 @@ export const phevCars: PhevCar[] = [
     rangeBasis: "EPA est.",
     accent: "#60a5fa",
     sourceUrl: "https://www.bmwusa.com/vehicles/plug-in-hybrid-electric.html",
+    photoSourceUrl: "https://commons.wikimedia.org/wiki/File:24_BMW_X5_xDrive50e_PHEV.jpg",
   },
   {
     id: "xc60-phev",
@@ -64,6 +68,7 @@ export const phevCars: PhevCar[] = [
     rangeBasis: "EPA est.",
     accent: "#7dd3fc",
     sourceUrl: "https://www.volvocars.com/us/cars/xc60-hybrid/",
+    photoSourceUrl: "https://commons.wikimedia.org/wiki/File:23_Volvo_XC60_Recharge_T8_Core_Bright_Theme.jpg",
   },
   {
     id: "sportage-phev",
@@ -77,6 +82,7 @@ export const phevCars: PhevCar[] = [
     rangeBasis: "EPA est.",
     accent: "#c4b5fd",
     sourceUrl: "https://www.kia.com/us/en/sportage-plug-in-hybrid",
+    photoSourceUrl: "https://commons.wikimedia.org/wiki/File:2023_Kia_Sportage_Plug-in_Hybrid.jpg",
   },
   {
     id: "tucson-phev",
@@ -90,6 +96,7 @@ export const phevCars: PhevCar[] = [
     rangeBasis: "EPA est.",
     accent: "#7dd3fc",
     sourceUrl: "https://www.hyundaiusa.com/us/en/vehicles/2025-tucson-plug-in-hybrid",
+    photoSourceUrl: "https://commons.wikimedia.org/wiki/File:25_Hyundai_Tucson_Plug-In_Hybrid_SEL.jpg",
   },
 ];
 

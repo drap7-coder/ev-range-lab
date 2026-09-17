@@ -487,6 +487,7 @@ input[type="range"]::-moz-range-thumb { width: 15px; height: 15px; border: 3px s
   background: var(--surface-2);
 }
 .vehicle-photo.compact { height: 142px; margin-top: 16px; }
+.phev-photo { height: 190px; margin-top: 18px; }
 .vehicle-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 56%, rgba(4, 7, 9, 0.84)); pointer-events: none; }
 .vehicle-image { object-fit: cover; object-position: center; filter: saturate(0.82); }
 .vehicle-photo figcaption { position: absolute; z-index: 2; right: 10px; bottom: 9px; left: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
