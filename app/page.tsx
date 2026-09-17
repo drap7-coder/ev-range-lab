@@ -217,9 +217,11 @@ function OutlookCard({
           </span>
           {moreEfficient ? <span className="efficient-badge">More efficient</span> : null}
         </div>
-        <span className={`status ${statusClass(status)}`} role="status">
-          {getArrivalStatusLabel(status)}
-        </span>
+        {status !== "ready" ? (
+          <span className={`status ${statusClass(status)}`} role="status">
+            {getArrivalStatusLabel(status)}
+          </span>
+        ) : null}
       </div>
 
       <VehiclePhoto car={car} compact={compact} />
