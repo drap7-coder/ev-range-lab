@@ -525,6 +525,9 @@ function ShoppingProfile({
 function Hero() {
   return (
     <section className="hero" aria-label="Find the EV that fits your life">
+      <div className="desktop-hero-art" aria-hidden="true">
+        <Image src="/hero-premium.png" alt="" fill sizes="(max-width: 1240px) 100vw, 1240px" priority unoptimized />
+      </div>
       <div className="hero-copy">
         <p className="eyebrow">Your EV decision laboratory</p>
         <h1>Find the EV that <em>fits your life.</em></h1>
@@ -532,13 +535,17 @@ function Hero() {
           Explore the models, compare the tradeoffs, and test how your trips, weather, speed, passengers, and landscape
           change real-world range—before you choose.
         </p>
-        <a className="hero-action" href="#lab">Enter the lab <span aria-hidden="true">↓</span></a>
+        <a className="hero-action mobile-hero-action" href="#lab">Enter the lab <span aria-hidden="true">↓</span></a>
       </div>
       <div className="hero-stage" aria-hidden="true">
         <figure className="hero-photo main">
           <Image src="/vehicles/model-3-lr.jpg" alt="" fill sizes="(max-width: 860px) 92vw, 480px" unoptimized />
         </figure>
         <div className="hero-caption"><span>{cars.length} EVs · {phevCars.length} PHEVs</span><strong>Real conditions. Honest range.</strong></div>
+      </div>
+      <div className="desktop-hero-actions">
+        <a className="hero-action" href="#lab">Enter the lab <span aria-hidden="true">↓</span></a>
+        <span>{cars.length} EVs · {phevCars.length} PHEVs · Live range simulator</span>
       </div>
     </section>
   );

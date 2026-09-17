@@ -26,6 +26,7 @@ test("server-renders EV Range Lab without starter metadata", async () => {
   assert.match(html, /Your EV decision laboratory/);
   assert.match(html, /Enter the lab/);
   assert.match(html, /Real conditions\. Honest range\./);
+  assert.match(html, /\/hero-premium\.png/);
   assert.match(html, />PHEV</);
   assert.match(html, /\/brand\/ev-mark-wide\.png/);
   assert.match(html, /\/icons\/favicon-32-v6\.png/);
