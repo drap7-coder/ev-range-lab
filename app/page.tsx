@@ -554,7 +554,7 @@ function Hero() {
       </div>
       <div className="hero-stage" aria-hidden="true">
         <figure className="hero-photo main">
-          <Image src="/vehicles/model-3-lr.jpg" alt="" fill sizes="(max-width: 860px) 92vw, 480px" unoptimized />
+          <Image src="/hero-premium.png" alt="" fill sizes="(max-width: 720px) 92vw, 480px" unoptimized />
         </figure>
         <div className="hero-caption"><span>{cars.length} EVs · {phevCars.length} PHEVs</span><strong>Real conditions. Honest range.</strong></div>
       </div>

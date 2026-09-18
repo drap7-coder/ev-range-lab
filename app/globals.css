@@ -189,6 +189,7 @@ h1 em { color: var(--lime); font-family: Georgia, serif; font-weight: 400; }
 }
 .hero-photo { position: absolute; inset: 0; margin: 0; }
 .hero-photo img { object-fit: cover; object-position: center 58%; filter: saturate(0.82) contrast(1.04); }
+.hero-stage .hero-photo img { object-position: center; filter: none; }
 .hero-stage::after {
   content: "";
   position: absolute;
