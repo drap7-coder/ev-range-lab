@@ -721,7 +721,7 @@ export default function Home() {
               aria-pressed={viewMode === "single"}
               onClick={() => setViewMode("single")}
             >
-              Single
+              Explore
             </button>
             <button
               type="button"
